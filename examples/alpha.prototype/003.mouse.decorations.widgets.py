@@ -125,7 +125,7 @@ class CuMovableTestInput(CuTestInput):
 		CuTestInput.event(self, evt)
 		if isinstance(evt, CuMouseEvent):
 			id, x, y, z, bstate = evt.getmouse()
-			if (bstate == evt.MOUSE_PRESSED)
+			#if (bstate == evt.MOUSE_PRESSED)
 
 		#if isinstance(evt, CuMouseEvent):
 		#	evt.getmouse()
