@@ -172,11 +172,19 @@ def CuInit(screen):
 	curses.curs_set(0) 
 	screen.keypad(1) 
 	curses.mousemask(curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION)
+	curses.mouseinterval(0)
 
-	screen.addstr(3,3,"This is a Sample Curses Script\n\n")
 	GLBL['maxY'], GLBL['maxX'] = screen.getmaxyx()
-	# printf("\033[?1003h\n"); // Makes the terminal report mouse movement events
+	#printf("\033[?1003h\n"); // Makes the terminal report mouse movement events
+	#print('\033[?1000h')
+	#print('\033[?1001h')
+	#print('\033[?1002h')
 	print('\033[?1003h')
+	#print('\033[?1004h')
+	#print('\033[?1005h')
+	#print('\033[?1006h')
+	#print('\033[?1015h')
+
 
 def main(screen):
 	GLBL['screen'] = screen;
@@ -236,4 +244,11 @@ try:
 	curses.wrapper(main)
 finally:
 	# Reset (disable) the terminal report mouse movement events
+	#rint('\033[?1000l')
+	#rint('\033[?1001l')
+	#rint('\033[?1002l')
 	print('\033[?1003l')
+	#rint('\033[?1004l')
+	#rint('\033[?1005l')
+	#rint('\033[?1006l')
+	#rint('\033[?1015l')
