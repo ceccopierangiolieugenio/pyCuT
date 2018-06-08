@@ -266,7 +266,13 @@ class CuMovableTestInput(CuTestInput):
 				self._state = None
 			elif evt.getState() == evt.REPORT_MOUSE_POSITION:
 				if self._state == "Pressed":
-					self.move(self._px+x-self._mx, self._py+y-self._my);
+					newx = self._px+x-self._mx
+					newy = self._py+y-self._my
+					if newx < 0: newx=0
+					if newy < 0: newy=0
+					if newx+self._w > GLBL['maxX'] : newx=GLBL['maxX']-self._w
+					if newy+self._h > GLBL['maxY'] : newy=GLBL['maxY']-self._h
+					self.move(newx, newy);
 
 
 
@@ -320,9 +326,9 @@ def main(screen):
 	tw2.setBorder(True)
 	layout.addWidget(tw2)
 
-	# mtw1 = CuMovableTestInput(parent=mw, x=20, y=15, w=30, h=12)
-	# mtw1.setBorder(True)
-	# layout.addWidget(mtw1)
+	mtw1 = CuMovableTestInput(parent=mw, x=20, y=15, w=30, h=12)
+	mtw1.setBorder(True)
+	layout.addWidget(mtw1)
 
 	mw.setLayout(layout)
 	mw.show()
