@@ -118,19 +118,51 @@ class CuHLayout(CuLayout):
 		return w, h
 
 	def update(self):
-		numWidgets = len(self._widgets)
 		x, y, w, h = self.geometry()
+		numWidgets = len(self._widgets)
+		leftWidgets = numWidgets
+		freeWidth = w
 		newx = x
 		for widget in self._widgets:
-			widget.resize(int(math.floor(w/numWidgets)),h)
-			widget.move(newx,y)
-			newx += int(math.floor(w/numWidgets))
+			sliceSize = int(math.floor(freeWidth/leftWidgets))
+			widget.setGeometry(newx, y, sliceSize, h)
+			newx += sliceSize
+			freeWidth -= sliceSize
+			leftWidgets -= 1
+
+class CuVLayout(CuLayout):
+	def __init__(self):
+		CuLayout.__init__(self)
+
+	def minimumSize(self):
+		''' process the widgets and get the min size '''
+		if len(self._widgets) == 0:
+			return 0, 0
+		w, h = (100000, 0)
+		for widget in self._widgets:
+			w1, h1  = widget.minimumSize()
+			h += h1
+			if w1 < w : w = w1
+		return w, h
+
+	def update(self):
+		x, y, w, h = self.geometry()
+		numWidgets = len(self._widgets)
+		leftWidgets = numWidgets
+		freeHeight = h
+		newy = y
+		for widget in self._widgets:
+			sliceSize = int(math.floor(freeHeight/leftWidgets))
+			widget.setGeometry(x, newy, w, sliceSize)
+			newy += sliceSize
+			freeHeight -= sliceSize
+			leftWidgets -= 1
+
 
 
 '''
     Widget
 '''
-
 
 class CuWidget:
 	_win = None
@@ -141,27 +173,38 @@ class CuWidget:
 	_parent = None
 	_border = False
 
-	def __init__(self, parent=None, x=0, y=0, w=-1, h=-1):
-		self._parent = parent
-		self._x = x
-		self._y = y
-		if w == -1: self._w = GLBL['maxX']
-		else:       self._w = w
-		if h == -1: self._h = GLBL['maxY']
-		else:       self._h = h
+	def __init__(self, *args, **kwargs):
+		logging.debug(str(kwargs))
+		if 'parent' in kwargs: self._parent = kwargs['parent']
+		else : self._parent = None
+		if 'name' in kwargs: self._name = kwargs['name']
+		else : self._name = ''
+		if 'x' in kwargs: self._x = kwargs['x']
+		else : self._x = 0
+		if 'y' in kwargs: self._y = kwargs['y']
+		else : self._y = 0
+		if 'w' in kwargs: self._w = kwargs['w']
+		else : self._w = GLBL['maxX']
+		if 'h' in kwargs: self._h = kwargs['h']
+		else : self._h = GLBL['maxY']
 		self._childs = []
 		self._win = curses.newwin(self._h, self._w, self._y, self._x)
 		self._panel = curses.panel.new_panel(self._win)
-		#self.panel.move(0, 0)
 
 	def getPos(self):
 		return self._x, self._y
 
 	def move(self, x, y):
-		self._x = x
-		self._y = y
 		# self._win.clear()
 		# logging.debug(__name__ + "x:" + str(self._x) + " y:" + str(self._y))
+		newx = x
+		newy = y
+		if newx < 0: newx=0
+		if newy < 0: newy=0
+		if newx+self._w > GLBL['maxX'] : newx=GLBL['maxX']-self._w
+		if newy+self._h > GLBL['maxY'] : newy=GLBL['maxY']-self._h
+		self._x = newx
+		self._y = newy
 		self._panel.move(self._y, self._x)
 
 	def setBorder(self, bool):
@@ -172,13 +215,17 @@ class CuWidget:
 			self._win.clear()
 
 	def resize(self, w, h):
-		self._w = w
-		self._h = h
+		neww = w
+		newh = h
+		if neww < 0: neww=0
+		if newh < 0: newh=0
+		if neww+self._x > GLBL['maxX'] : neww=GLBL['maxX']-self._x
+		if newh+self._y > GLBL['maxY'] : newh=GLBL['maxY']-self._y
+		self._w = neww
+		self._h = newh
 		self._win.clear()
-		self._win.resize(h,w)
-		if self._layout is not None:
-			self._layout.setGeometry(self._x+1, self._y+1, self._w-2, self._h-2)
-			self._layout.update()
+		self._win.resize(self._h,self._w)
+
 		if self._border:
 			self._win.box()
 
@@ -205,6 +252,35 @@ class CuWidget:
 	def layout(self):
 		return self._layout
 
+	def setGeometry(self, x, y, w, h):
+		# logging.debug("FROM:"+str({"SELF":self._name, "x":x,"y":y,"w":w,"h":h}))
+		# logging.debug("TO:  "+str({"SELF":self._name, "x":self._x,"y":self._y,"w":self._w,"h":self._h}))
+		if self._w == w and self._h == h:
+			if self._x != x or self._y != y:
+				self.move(x, y)
+			else:
+				return
+		elif self._x == x and self._y == y:
+			self.resize(w, h)
+		elif self._x + w < GLBL['maxX'] and self._y + h < GLBL['maxY']:
+			self.resize(w, h)
+			self.move(x, y)
+		else:
+			# logging.debug("EXTRA:"+str({"SELF":self._name, "x":self._x,"y":self._y,"w":self._w,"h":self._h}))
+			self._x = x
+			self._y = y
+			self._w = w
+			self._h = h
+			self.resize(w, h)
+			self.move(x, y)
+
+		if self._layout is not None:
+			if self._border:
+				self._layout.setGeometry(self._x+1, self._y+1, self._w-2, self._h-2)
+			else:
+				self._layout.setGeometry(self._x, self._y, self._w, self._h)
+			self._layout.update()
+
 	def show(self):
 		pass
 
@@ -212,10 +288,12 @@ class CuWidget:
 
 
 class CuMainWindow(CuWidget):
-	def __init__(self, parent=None, x=0, y=0, w=-1, h=-1):
-		CuWidget.__init__(self, parent=parent, x=x, y=y, w=w, h=h)
+	def __init__(self, *args, **kwargs):
+		CuWidget.__init__(self, *args, **kwargs)
 
-
+class CuPanel(CuWidget):
+	def __init__(self, *args, **kwargs):
+		CuWidget.__init__(self, *args, **kwargs)
 
 
 
@@ -223,13 +301,13 @@ class CuTestInput(CuWidget):
 	_id, _ix, _iy, _iz, _bstate = 0, 0, 0, 0, 0
 	_iterator = 0
 
-	def __init__(self, parent=None, x=0, y=0, w=0, h=0):
-		CuWidget.__init__(self, parent=parent, x=x, y=y, w=w, h=h)
+	def __init__(self, *args, **kwargs):
+		CuWidget.__init__(self, *args, **kwargs)
 
 	def paint(self):
 		CuWidget.paint(self)
 		# self.getWin().clear()
-		self.getWin().addstr(3, 3, "CuTestInput... it: " + str(self._iterator))
+		self.getWin().addstr(3, 3, "CuTestInput... [" + self._name + "] it: " + str(self._iterator))
 		self.getWin().addstr(4, 3, "    id: " + str(self._id))
 		self.getWin().addstr(5, 3, "     x: " + str(self._ix))
 		self.getWin().addstr(6, 3, "     y: " + str(self._iy))
@@ -248,6 +326,7 @@ class CuMovableTestInput(CuTestInput):
 	_state = None
 	_px, _py = 0, 0
 	_mx, _my = 0, 0
+
 	def paint(self):
 		CuTestInput.paint(self)
 		self.getWin().addstr(2, 3, "[MOVABLE] " + str(self._state) + "    ")
@@ -312,25 +391,40 @@ def CuEnd():
 def main(screen):
 	GLBL['screen'] = screen;
 	CuInit(screen)
+	logging.debug("GLBL: " +  str(GLBL))
 
 	mw = CuMainWindow()
 	mw.setBorder(True)
 
 	layout = CuHLayout()
 
-	tw1 = CuTestInput(parent=mw, x=50, y=5, w=30, h=12)
+	tw1 = CuTestInput(parent=mw, name='tw1')
 	tw1.setBorder(True)
 	layout.addWidget(tw1)
 
-	tw2 = CuTestInput(parent=mw, x=30, y=20, w=30, h=12)
+	tw2 = CuTestInput(parent=mw, name='tw2')
 	tw2.setBorder(True)
 	layout.addWidget(tw2)
 
-	mtw1 = CuMovableTestInput(parent=mw, x=20, y=15, w=30, h=12)
+	vlayout = CuVLayout()
+	p1 = CuPanel(parent=mw, name='p1')
+	p1.setBorder(True)
+	layout.addWidget(p1)
+
+	tw4 = CuTestInput(parent=mw, name='tw4')
+	tw4.setBorder(True)
+	layout.addWidget(tw4)
+
+	tw3 = CuTestInput(parent=p1, name='tw3')
+	tw3.setBorder(True)
+	vlayout.addWidget(tw3)
+
+	mtw1 = CuMovableTestInput(parent=p1, name='mtw1')
 	mtw1.setBorder(True)
-	layout.addWidget(mtw1)
+	vlayout.addWidget(mtw1)
 
 	mw.setLayout(layout)
+	p1.setLayout(vlayout)
 	mw.show()
 
 
@@ -351,6 +445,8 @@ def main(screen):
 		it += 1
 		tw1.setIterator(it)
 		tw2.setIterator(it)
+		tw3.setIterator(it)
+		# mtv1.setIterator(it)
 
 		if event == curses.ERR: break
 		if event == ord("q"): break
@@ -361,7 +457,9 @@ def main(screen):
 			evt = CuMouseEvent()
 		if event == curses.KEY_RESIZE:
 			GLBL['maxY'], GLBL['maxX'] = screen.getmaxyx()
-			mw.resize(GLBL['maxX'], GLBL['maxY'])
+			logging.debug("RESIZE: " +  str(GLBL))
+			mw.setGeometry(0,0,GLBL['maxX'], GLBL['maxY'])
+			mw.paint()
 
 		mw.event(evt)
 
