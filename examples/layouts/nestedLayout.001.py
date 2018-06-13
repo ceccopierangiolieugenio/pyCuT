@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from CuT.CuTCore import CuApplication, CuWrapper
-from CuT.CuTWidgets import CuMainWindow, CuWidget, CuHLayout, CuVLayout, CuPanel
+from CuT.CuTWidgets import CuMainWindow, CuWidget, CuHBoxLayout, CuVBoxLayout, CuPanel
 
 class MainWindow(CuMainWindow):
 	pass
@@ -21,7 +21,7 @@ def main(screen):
 	window = MainWindow()
 	window.setBorder(True)
 
-	layout = CuHLayout()
+	layout = CuHBoxLayout()
 
 	tw1 = Widget(parent=window)
 	tw1.setAccessibleName('tw1')
@@ -30,11 +30,10 @@ def main(screen):
 
 	tw2 = Widget(parent=window)
 	tw2.setAccessibleName('tw2')
-	tw2.setBorder(True)
 	layout.addWidget(tw2)
 
-	vlayout1 = CuVLayout()
-	vlayout2 = CuVLayout()
+	vlayout1 = CuVBoxLayout()
+	vlayout2 = CuVBoxLayout()
 
 	p1 = CuPanel(parent=window)
 	p1.setBorder(True)

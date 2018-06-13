@@ -57,7 +57,7 @@ class CuLayout(CuLayoutItem):
 			widget.event(evt)
 
 
-class CuHLayout(CuLayout):
+class CuHBoxLayout(CuLayout):
 	def __init__(self):
 		CuLayout.__init__(self)
 
@@ -85,7 +85,7 @@ class CuHLayout(CuLayout):
 			freeWidth -= sliceSize
 			leftWidgets -= 1
 
-class CuVLayout(CuLayout):
+class CuVBoxLayout(CuLayout):
 	def __init__(self):
 		CuLayout.__init__(self)
 
