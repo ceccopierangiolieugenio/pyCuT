@@ -5,3 +5,9 @@
   [ ] Set and Remove Border
   [ ] Mouse Move on Putty
 
+# Panels/Windows
+  [ ] Use relative position
+
+# Misc
+  [ ] Get rid of ncurses
+
