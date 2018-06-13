@@ -5,6 +5,9 @@
   [ ] Set and Remove Border
   [ ] Mouse Move on Putty
 
+# [ ] Better Update Layout
+         In the Widget the update routine is redunndant (border check)
+
 # Panels/Windows
   [ ] Use relative position
 

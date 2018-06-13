@@ -40,6 +40,13 @@ class CuWidget:
 		self._win = curses.newwin(self._h, self._w, self._y, self._x)
 		self._panel = curses.panel.new_panel(self._win)
 
+	def accessibleName(self):
+		return self._name
+
+	def setAccessibleName(self, name):
+		self._name = name
+
+
 	def getPos(self):
 		return self._x, self._y
 
@@ -93,7 +100,10 @@ class CuWidget:
 		if isinstance(layout, CuLayout):
 			self._layout = layout
 			self._layout.setParent(self)
-			self._layout.setGeometry(self._x+1, self._y+1, self._w-2, self._h-2)
+			if self._border:
+				self._layout.setGeometry(self._x+1, self._y+1, self._w-2, self._h-2)
+			else:
+				self._layout.setGeometry(self._x, self._y, self._w, self._h)
 			self._layout.update()
 		else:
 			raise Exception(str(layout) + ' not of type CuLayout')
