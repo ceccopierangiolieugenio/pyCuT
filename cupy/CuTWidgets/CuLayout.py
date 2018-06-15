@@ -3,10 +3,7 @@
 '''
 
 import curses, curses.panel
-import math
 import logging
-
-from CuLayout import *
 
 class CuLayoutItem:
 	_x, _y, _w, _h = 0, 0, 0, 0
@@ -79,7 +76,7 @@ class CuHBoxLayout(CuLayout):
 		freeWidth = w
 		newx = x
 		for widget in self._widgets:
-			sliceSize = int(math.floor(freeWidth/leftWidgets))
+			sliceSize = freeWidth//leftWidgets
 			widget.setGeometry(newx, y, sliceSize, h)
 			newx += sliceSize
 			freeWidth -= sliceSize
@@ -107,7 +104,7 @@ class CuVBoxLayout(CuLayout):
 		freeHeight = h
 		newy = y
 		for widget in self._widgets:
-			sliceSize = int(math.floor(freeHeight/leftWidgets))
+			sliceSize = freeHeight//leftWidgets
 			widget.setGeometry(x, newy, w, sliceSize)
 			newy += sliceSize
 			freeHeight -= sliceSize

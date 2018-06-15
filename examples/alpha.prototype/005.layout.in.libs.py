@@ -17,13 +17,12 @@ class CuTestInput(CuTWidgets.CuWidget):
 	def paint(self):
 		CuTWidgets.CuWidget.paint(self)
 		# self.getWin().clear()
-		self.getWin().addstr(3, 3, "CuTestInput... [" + self._name + "] it: " + str(self._iterator))
+		self.getWin().addstr(3, 3, "CuTestInput... [" + self.accessibleName() + "] it: " + str(self._iterator))
 		self.getWin().addstr(4, 3, "    id: " + str(self._id))
 		self.getWin().addstr(5, 3, "     x: " + str(self._ix))
 		self.getWin().addstr(6, 3, "     y: " + str(self._iy))
 		self.getWin().addstr(7, 3, "     z: " + str(self._iz))
 		self.getWin().addstr(8, 3, "bstate: " + str(self._bstate) + "        ")
-		self.getWin().addstr(9, 3, "childs: " + str(len(self._childs)))
 
 	def event(self, evt):
 		if isinstance(evt, CuTCore.CuMouseEvent):
@@ -59,8 +58,8 @@ class CuMovableTestInput(CuTestInput):
 					newy = self._py+y-self._my
 					if newx < 0: newx=0
 					if newy < 0: newy=0
-					if newx+self._w > CuTWidgets.CuApplication.getW() : newx=CuTWidgets.CuApplication.getW()-self._w
-					if newy+self._h > CuTWidgets.CuApplication.getH() : newy=CuTWidgets.CuApplication.getH()-self._h
+					if newx+self.width()  > CuTWidgets.CuApplication.getW() : newx=CuTWidgets.CuApplication.getW()-self.width()
+					if newy+self.height() > CuTWidgets.CuApplication.getH() : newy=CuTWidgets.CuApplication.getH()-self.height()
 					self.move(newx, newy);
 
 
