@@ -70,13 +70,45 @@ class CuApplication:
 	def is_initialized():
 		return CuApplication.GLBL['screen'] != None
 
+	@staticmethod
+	def refreshMain():
+		x, y = 0, 0
+		CuApplication.GLBL['maxY'], CuApplication.GLBL['maxX'] = CuApplication.GLBL['screen'].getmaxyx()
+		maxw, maxh = CuApplication.GLBL['mainWidget'].maximumSize()
+		minw, minh = CuApplication.GLBL['mainWidget'].minimumSize()
+
+		#logging.debug(__name__ + "  screen: " + str((CuApplication.GLBL['maxX'], CuApplication.GLBL['maxY'])))
+		#logging.debug(__name__ + "  min:    " + str(CuApplication.GLBL['mainWidget'].minimumSize()))
+		#logging.debug(__name__ + "  max:    " + str(CuApplication.GLBL['mainWidget'].maximumSize()))
+
+		if ( CuApplication.GLBL['maxX'] < minw ) or ( CuApplication.GLBL['maxY'] < minh ):
+			logging.debug(__name__ + "HIDE!!!")
+			CuApplication.GLBL['mainWidget'].hide()
+			CuApplication.GLBL['screen'].addstr(1, 1, "The Terminal Size")
+			CuApplication.GLBL['screen'].addstr(2, 1, "is too small...")
+			return
+		if not CuApplication.GLBL['mainWidget'].isVisible():
+			logging.debug(__name__ + "SHOW!!!")
+			CuApplication.GLBL['screen'].clear()
+
+		if CuApplication.GLBL['maxX'] > maxw : x = (CuApplication.GLBL['maxX']-maxw )//2
+		else: maxw = CuApplication.GLBL['maxX']
+
+		if CuApplication.GLBL['maxY'] > maxh : y = (CuApplication.GLBL['maxY']-maxh )//2
+		else: maxh = CuApplication.GLBL['maxX']
+
+		CuApplication.GLBL['mainWidget'].setGeometry(x, y, maxw, maxh)
+		CuApplication.GLBL['mainWidget'].paint()
+		CuApplication.GLBL['mainWidget'].show()
+
 	def exec_(self):
 		event = 0
+		CuApplication.refreshMain()
 		while True:
-			CuApplication.GLBL['mainWidget'].paint()
-
-			curses.panel.update_panels()
-			CuApplication.GLBL['screen'].refresh()
+			if CuApplication.GLBL['mainWidget'].isVisible():
+				CuApplication.GLBL['mainWidget'].paint()
+				curses.panel.update_panels()
+				CuApplication.GLBL['screen'].refresh()
 
 			event = CuApplication.GLBL['screen'].getch()
 
@@ -87,10 +119,9 @@ class CuApplication:
 
 			if event == curses.KEY_MOUSE:
 				evt = CuMouseEvent()
+
 			if event == curses.KEY_RESIZE:
-				CuApplication.GLBL['maxY'], CuApplication.GLBL['maxX'] = CuApplication.GLBL['screen'].getmaxyx()
-				CuApplication.GLBL['mainWidget'].setGeometry(0, 0, CuApplication.GLBL['maxX'], CuApplication.GLBL['maxY'])
-				CuApplication.GLBL['mainWidget'].paint()
+				CuApplication.refreshMain()
 
 			CuApplication.GLBL['mainWidget'].event(evt)
 		return 0
