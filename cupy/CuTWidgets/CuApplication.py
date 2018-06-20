@@ -6,7 +6,7 @@ import curses, curses.panel
 import logging
 
 from CuT.CuTCore import CuMouseEvent
-
+from CuT.CuTHelper import CuWrapper
 
 class CuApplication:
 	GLBL = {
@@ -28,27 +28,9 @@ class CuApplication:
 		curses.mouseinterval(0)
 		CuApplication.GLBL['screen'] = screen
 		CuApplication.GLBL['maxY'], CuApplication.GLBL['maxX'] = screen.getmaxyx()
-		#printf("\033[?1003h\n"); // Makes the terminal report mouse movement events
-		#print('\033[?1000h')
-		#print('\033[?1001h')
-		#print('\033[?1002h')
-		print('\033[?1003h')
-		#print('\033[?1004h')
-		#print('\033[?1005h')
-		#print('\033[?1006h')
-		#print('\033[?1015h')
 
-	@staticmethod
-	def __CuEnd__():
-		# Reset (disable) the terminal report mouse movement events
-		#rint('\033[?1000l')
-		#rint('\033[?1001l')
-		#rint('\033[?1002l')
-		print('\033[?1003l')
-		#rint('\033[?1004l')
-		#rint('\033[?1005l')
-		#rint('\033[?1006l')
-		#rint('\033[?1015l')
+		CuWrapper.initWrapper()
+		CuWrapper.__CuInit__()
 
 	@staticmethod
 	def setMainWidget(widget):
@@ -99,6 +81,7 @@ class CuApplication:
 
 		CuApplication.GLBL['mainWidget'].setGeometry(x, y, maxw, maxh)
 		CuApplication.GLBL['mainWidget'].paint()
+		CuApplication.GLBL['mainWidget'].paintEvent(None)
 		CuApplication.GLBL['mainWidget'].show()
 
 	def exec_(self):
@@ -107,6 +90,7 @@ class CuApplication:
 		while True:
 			if CuApplication.GLBL['mainWidget'].isVisible():
 				CuApplication.GLBL['mainWidget'].paint()
+				CuApplication.GLBL['mainWidget'].paintEvent(None)
 				curses.panel.update_panels()
 				CuApplication.GLBL['screen'].refresh()
 

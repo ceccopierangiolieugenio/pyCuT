@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
-from CuT.CuTCore import CuApplication, CuWrapper
-from CuT.CuTWidgets import CuMainWindow
+from CuT.CuTWidgets import CuApplication, CuMainWindow
+from CuT.CuTHelper import CuWrapper
 
 class MainWindow(CuMainWindow):
 	def paint(self):
@@ -20,4 +20,4 @@ def main(screen):
 
 
 if __name__ == '__main__':
-	CuWrapper(main)
+	CuWrapper.init(main)

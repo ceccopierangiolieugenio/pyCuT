@@ -3,6 +3,7 @@
 import sys
 
 from CuT import CuTCore, CuTWidgets
+from CuT.CuTHelper import CuWrapper
 
 class CuTestInput(CuTWidgets.CuWidget):
 	_id, _ix, _iy, _iz, _bstate = 0, 0, 0, 0, 0
@@ -18,11 +19,11 @@ class CuTestInput(CuTWidgets.CuWidget):
 		CuTWidgets.CuWidget.paint(self)
 		# self.getWin().clear()
 		self.getWin().addstr(3, 3, "CuTestInput... [" + self.accessibleName() + "] it: " + str(self._iterator))
-		self.getWin().addstr(4, 3, "    id: " + str(self._id))
-		self.getWin().addstr(5, 3, "     x: " + str(self._ix))
-		self.getWin().addstr(6, 3, "     y: " + str(self._iy))
-		self.getWin().addstr(7, 3, "     z: " + str(self._iz))
-		self.getWin().addstr(8, 3, "bstate: " + str(self._bstate) + "        ")
+		self.getWin().addstr(3, 4, "    id: " + str(self._id))
+		self.getWin().addstr(3, 5, "     x: " + str(self._ix))
+		self.getWin().addstr(3, 6, "     y: " + str(self._iy))
+		self.getWin().addstr(3, 7, "     z: " + str(self._iz))
+		self.getWin().addstr(3, 8, "bstate: " + str(self._bstate) + "        ")
 
 	def event(self, evt):
 		if isinstance(evt, CuTCore.CuMouseEvent):
@@ -38,7 +39,7 @@ class CuMovableTestInput(CuTestInput):
 
 	def paint(self):
 		CuTestInput.paint(self)
-		self.getWin().addstr(2, 3, "[MOVABLE] " + str(self._state) + "    ")
+		self.getWin().addstr(3, 2, "[MOVABLE] " + str(self._state) + "    ")
 
 	def event(self, evt):
 		CuTestInput.event(self, evt)
@@ -105,4 +106,4 @@ def main(screen):
 	app.exec_()
 
 
-CuTCore.CuWrapper(main)
+CuWrapper.init(main)

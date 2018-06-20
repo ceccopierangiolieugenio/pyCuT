@@ -1,18 +1,25 @@
 #!/usr/bin/python
 
-from CuT.CuTCore import CuApplication, CuWrapper
-from CuT.CuTWidgets import CuMainWindow, CuWidget, CuHBoxLayout, CuVBoxLayout, CuPanel
+from CuT.CuTCore import  CuT
+from CuT.CuTGui import CuPainter
+from CuT.CuTWidgets import CuApplication, CuMainWindow, CuWidget, CuHBoxLayout, CuVBoxLayout, CuPanel
+from CuT.CuTHelper import CuWrapper
 
 class MainWindow(CuMainWindow):
 	pass
 
-
 class Widget(CuWidget):
-	def paint(self):
-		CuWidget.paint(self)
-		self.getWin().addstr(3, 3, "Widget")
-		self.getWin().addstr(4, 3, self.accessibleName())
-
+	def paintEvent(self, event):
+		qp = CuPainter()
+		qp.begin(self)
+		qp.setPen(CuT.white)
+		qp.drawText(3, 3, "Widget")
+		qp.setPen(CuT.yellow)
+		qp.drawText(3, 4, self.accessibleName())
+		qp.setPen(CuT.green)
+		qp.drawText(3, 5, "Size: " + str(self.size()))
+		qp.drawText(3, 10, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.end()
 
 def main(screen):
 	import sys
@@ -41,7 +48,7 @@ def main(screen):
 
 	tw3 = Widget(parent=p1)
 	tw3.setAccessibleName('tw3')
-	tw3.setBorder(True)
+	tw3.setBorder(False)
 	vlayout1.addWidget(tw3)
 
 	tw5 = Widget(parent=p1)
@@ -71,4 +78,4 @@ def main(screen):
 
 
 if __name__ == '__main__':
-	CuWrapper(main)
+	CuWrapper.init(main)

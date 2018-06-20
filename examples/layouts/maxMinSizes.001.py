@@ -1,20 +1,31 @@
 #!/usr/bin/python
 
-from CuT.CuTCore import CuApplication, CuWrapper
-from CuT.CuTWidgets import CuMainWindow, CuWidget, CuHBoxLayout, CuVBoxLayout, CuPanel
+from CuT.CuTGui import CuPainter
+from CuT.CuTCore import  CuT
+from CuT.CuTWidgets import CuApplication, CuMainWindow, CuWidget, CuHBoxLayout, CuVBoxLayout, CuPanel
+from CuT.CuTHelper import CuWrapper
+
 
 class MainWindow(CuMainWindow):
 	pass
 
 
 class Widget(CuWidget):
-	def paint(self):
-		CuWidget.paint(self)
-		self.getWin().addstr(3, 3, "Widget")
-		self.getWin().addstr(4, 3, self.accessibleName())
-		self.getWin().addstr(5, 3, "Max: "  + str(self.maximumSize()))
-		self.getWin().addstr(6, 3, "Min: "  + str(self.minimumSize()))
-		self.getWin().addstr(7, 3, "Size: " + str(self.size()))
+	def paintEvent(self, event):
+		qp = CuPainter()
+		qp.begin(self)
+		qp.setPen(CuT.white)
+		qp.drawText(3, 3, "Widget")
+		qp.setPen(CuT.yellow)
+		qp.drawText(3, 4, self.accessibleName())
+		qp.setPen(CuT.green)
+		qp.drawText(3, 5, "Max: "  + str(self.maximumSize()))
+		qp.drawText(3, 6, "Min: "  + str(self.minimumSize()))
+		qp.setPen(CuT.red)
+		qp.drawText(3, 7, "Size: " + str(self.size()))
+		qp.setPen(CuT.lightGray)
+		qp.drawText(3, 12, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.end()
 
 
 def main(screen):
@@ -54,11 +65,11 @@ def main(screen):
 	layout.addWidget(p2)
 
 	tw6 = Widget(parent=p2); tw6.setAccessibleName('tw6'); tw6.setBorder(True)
-	tw6.setMaximumSize(50,9000)
+	tw6.setMaximumSize(60,9000)
 	vlayout2.addWidget(tw6)
 
 	tw7 = Widget(parent=p2); tw7.setAccessibleName('tw7'); tw7.setBorder(True)
-	tw7.setMaximumSize(50,9000)
+	tw7.setMaximumSize(60,9000)
 	vlayout2.addWidget(tw7)
 
 	window.setLayout(layout)
@@ -70,4 +81,4 @@ def main(screen):
 
 
 if __name__ == '__main__':
-	CuWrapper(main)
+	CuWrapper.init(main)

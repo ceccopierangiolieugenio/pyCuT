@@ -2,9 +2,9 @@
     Widget
 '''
 
-import curses, curses.panel
 import logging
 import os
+from CuT.CuTHelper import CuWrapper
 
 from .CuLayout import *
 from .CuApplication import *
@@ -37,8 +37,7 @@ class CuWidget:
 		if 'h' in kwargs: self._data['h'] = kwargs['h']
 		else : self._data['h'] = CuApplication.getH()
 		self._data['childs'] = []
-		self._data['win'] = curses.newwin(self._data['h'], self._data['w'], self._data['y'], self._data['x'])
-		self._data['panel'] = curses.panel.new_panel(self._data['win'])
+		self._data['win'] = CuWrapper.newWin(self._data['x'], self._data['y'], self._data['w'], self._data['h'])
 		self._data['layout'] = None
 		self._data['border'] = False
 		self._data['borderSize'] = 0
@@ -51,6 +50,9 @@ class CuWidget:
 		self._data['name'] = name
 
 
+	def border(self):
+		return self._data['border']
+
 	def setBorder(self, bool):
 		self._data['border'] = bool
 		if bool:
@@ -60,14 +62,16 @@ class CuWidget:
 			self._data['borderSize'] = 0
 			self._data['win'].clear()
 
-
-
 	def getWin(self):
 		return self._data['win']
 
 	def paint(self):
 		if self._data['layout'] is not None:
 			self._data['layout'].paint()
+
+	def paintEvent(self, event):
+		if self._data['layout'] is not None:
+			self._data['layout'].paintEvent(event)
 
 	def event(self, evt):
 		if self._data['layout'] is not None:
@@ -91,7 +95,7 @@ class CuWidget:
 	def height(self): return self._data['h']
 
 	def getPos(self): return self._data['x'], self._data['y']
-	def size(self):       return self._data['w'], self._data['h']
+	def size(self):   return self._data['w'], self._data['h']
 
 	def maximumSize(self):
 		return self.maximumWidth(), self.maximumHeight()
@@ -140,7 +144,7 @@ class CuWidget:
 		self._data['y'] = newy
 		# logging.debug(__name__ + "  Visible:    " + str(self._data['visible']))
 		# logging.debug(__name__ + "  Move:    " + str((self._data['x'], self._data['y'],self._data['h'],self._data['w'])))
-		self._data['panel'].move(self._data['y'], self._data['x'])
+		self._data['win'].move(self._data['x'], self._data['y'])
 
 	def resize(self, w, h):
 		neww = w
@@ -152,7 +156,7 @@ class CuWidget:
 		self._data['w'] = neww
 		self._data['h'] = newh
 		self._data['win'].clear()
-		self._data['win'].resize(self._data['h'],self._data['w'])
+		self._data['win'].resize(self._data['w'],self._data['h'])
 
 		if self._data['border']:
 			self._data['win'].box()
@@ -194,14 +198,14 @@ class CuWidget:
 	#def setMinimumSize(self, minw: int, minh: int): pass
 
 	def show(self):
-		self._data['panel'].show()
+		self._data['win'].show()
 		self._data['visible'] = True
 		if self._data['layout'] is not None:
 			for i in range(self._data['layout'].count()):
 				self._data['layout'].itemAt(i).show()
 
 	def hide(self):
-		self._data['panel'].hide()
+		self._data['win'].hide()
 		self._data['visible'] = False
 		if self._data['layout'] is not None:
 			for i in range(self._data['layout'].count()):

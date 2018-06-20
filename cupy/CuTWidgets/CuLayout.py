@@ -2,7 +2,6 @@
     Layout System
 '''
 
-import curses, curses.panel
 import logging
 
 class CuLayoutItem:
@@ -62,6 +61,10 @@ class CuLayout(CuLayoutItem):
 	def paint(self):
 		for widget in self._widgets:
 			widget.paint()
+
+	def paintEvent(self, event):
+		for widget in self._widgets:
+			widget.paintEvent(event)
 
 	def event(self, evt):
 		for widget in self._widgets:
