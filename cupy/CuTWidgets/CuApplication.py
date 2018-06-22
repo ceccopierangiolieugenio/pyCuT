@@ -52,6 +52,22 @@ class CuApplication:
 	def is_initialized():
 		return CuApplication.GLBL['screen'] != None
 
+
+	_updateWidget = []
+	@staticmethod
+	def addUpdateWidget(widget):
+		if widget not in CuApplication._updateWidget:
+			CuApplication._updateWidget.append(widget)
+
+	@staticmethod
+	def paintAll():
+		#CuApplication.GLBL['mainWidget'].paintEvent(None)
+		for widget in CuApplication._updateWidget:
+			widget.paintEvent(None)
+		CuApplication._updateWidget = []
+		curses.panel.update_panels()
+		CuApplication.GLBL['screen'].refresh()
+
 	@staticmethod
 	def refreshMain():
 		x, y = 0, 0
@@ -80,19 +96,17 @@ class CuApplication:
 		else: maxh = CuApplication.GLBL['maxX']
 
 		CuApplication.GLBL['mainWidget'].setGeometry(x, y, maxw, maxh)
-		CuApplication.GLBL['mainWidget'].paint()
-		CuApplication.GLBL['mainWidget'].paintEvent(None)
 		CuApplication.GLBL['mainWidget'].show()
 
 	def exec_(self):
 		event = 0
 		CuApplication.refreshMain()
+		CuApplication.paintAll()
 		while True:
 			if CuApplication.GLBL['mainWidget'].isVisible():
-				CuApplication.GLBL['mainWidget'].paint()
-				CuApplication.GLBL['mainWidget'].paintEvent(None)
-				curses.panel.update_panels()
-				CuApplication.GLBL['screen'].refresh()
+				# CuApplication.GLBL['mainWidget'].paintEvent(None)
+				#CuApplication.GLBL['mainWidget'].update()
+				CuApplication.paintAll()
 
 			event = CuApplication.GLBL['screen'].getch()
 

@@ -4,7 +4,7 @@ from CuT.CuTWidgets import CuApplication, CuMainWindow
 from CuT.CuTHelper import CuWrapper
 
 class MainWindow(CuMainWindow):
-	def paint(self):
+	def paintEvent(self, evt):
 		CuMainWindow.paint(self)
 		self.getWin().addstr(3, 3, "MainWindow")
 

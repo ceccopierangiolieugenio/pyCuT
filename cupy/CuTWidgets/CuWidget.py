@@ -65,10 +65,6 @@ class CuWidget:
 	def getWin(self):
 		return self._data['win']
 
-	def paint(self):
-		if self._data['layout'] is not None:
-			self._data['layout'].paint()
-
 	def paintEvent(self, event):
 		if self._data['layout'] is not None:
 			self._data['layout'].paintEvent(event)
@@ -143,7 +139,7 @@ class CuWidget:
 		self._data['x'] = newx
 		self._data['y'] = newy
 		# logging.debug(__name__ + "  Visible:    " + str(self._data['visible']))
-		# logging.debug(__name__ + "  Move:    " + str((self._data['x'], self._data['y'],self._data['h'],self._data['w'])))
+		logging.debug(__name__ + "  Move:    " + str((self._data['x'], self._data['y'],self._data['h'],self._data['w'])))
 		self._data['win'].move(self._data['x'], self._data['y'])
 
 	def resize(self, w, h):
@@ -202,19 +198,26 @@ class CuWidget:
 		self._data['visible'] = True
 		if self._data['layout'] is not None:
 			for i in range(self._data['layout'].count()):
-				self._data['layout'].itemAt(i).show()
+				item = self._data['layout'].itemAt(i)
+				if isinstance(item, CuWidgetItem) and not item.isEmpty():
+					item.widget().show()
 
 	def hide(self):
 		self._data['win'].hide()
 		self._data['visible'] = False
 		if self._data['layout'] is not None:
 			for i in range(self._data['layout'].count()):
-				self._data['layout'].itemAt(i).hide()
+				item = self._data['layout'].itemAt(i)
+				if isinstance(item, CuWidgetItem) and not item.isEmpty():
+					item.widget().hide()
 
 	def isVisible(self):
 		return self._data['visible']
 
-
+	def update(self):
+		CuApplication.addUpdateWidget(self)
+		if self._data['layout'] is not None:
+			self._data['layout'].update()
 
 
 class CuMainWindow(CuWidget):

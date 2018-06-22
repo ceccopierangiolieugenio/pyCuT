@@ -3,43 +3,50 @@
 import sys
 
 from CuT import CuTCore, CuTWidgets
+from CuT.CuTCore import  CuT
+from CuT.CuTGui import CuPainter
 from CuT.CuTHelper import CuWrapper
 
 class CuTestInput(CuTWidgets.CuWidget):
 	_id, _ix, _iy, _iz, _bstate = 0, 0, 0, 0, 0
-	_iterator = 0
 
 	def __init__(self, *args, **kwargs):
 		CuTWidgets.CuWidget.__init__(self, *args, **kwargs)
 
-
-
-
-	def paint(self):
-		CuTWidgets.CuWidget.paint(self)
-		# self.getWin().clear()
-		self.getWin().addstr(3, 3, "CuTestInput... [" + self.accessibleName() + "] it: " + str(self._iterator))
-		self.getWin().addstr(3, 4, "    id: " + str(self._id))
-		self.getWin().addstr(3, 5, "     x: " + str(self._ix))
-		self.getWin().addstr(3, 6, "     y: " + str(self._iy))
-		self.getWin().addstr(3, 7, "     z: " + str(self._iz))
-		self.getWin().addstr(3, 8, "bstate: " + str(self._bstate) + "        ")
+	def paintEvent(self, event):
+		qp = CuPainter()
+		qp.begin(self)
+		qp.setPen(CuT.white)
+		qp.drawText(3, 3, "CuTestInput... [" + self.accessibleName() + "]")
+		qp.setPen(CuT.yellow)
+		qp.drawText(3, 4, "    id: " + str(self._id))
+		qp.setPen(CuT.green)
+		qp.drawText(3, 5, "     x: " + str(self._ix))
+		qp.drawText(3, 6, "     y: " + str(self._iy))
+		qp.drawText(3, 7, "     z: " + str(self._iz))
+		qp.setPen(CuT.red)
+		qp.drawText(3, 8, "bstate: " + str(self._bstate) + "        ")
+		qp.setPen(CuT.lightGray)
+		qp.drawText(3, 12, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.end()
 
 	def event(self, evt):
 		if isinstance(evt, CuTCore.CuMouseEvent):
 			self._id, self._ix, self._iy, self._iz, self._bstate = evt.getmouse()
-
-	def setIterator(self, it):
-		self._iterator = it;
+		self.update()
 
 class CuMovableTestInput(CuTestInput):
 	_state = None
 	_px, _py = 0, 0
 	_mx, _my = 0, 0
 
-	def paint(self):
-		CuTestInput.paint(self)
-		self.getWin().addstr(3, 2, "[MOVABLE] " + str(self._state) + "    ")
+	def paintEvent(self, event):
+		CuTestInput.paintEvent(self, event)
+		qp = CuPainter()
+		qp.begin(self)
+		qp.setPen(CuT.blue)
+		qp.drawText(3, 2, "[MOVABLE] " + str(self._state) + "    ")
+		qp.end()
 
 	def event(self, evt):
 		CuTestInput.event(self, evt)
@@ -62,6 +69,7 @@ class CuMovableTestInput(CuTestInput):
 					if newx+self.width()  > CuTWidgets.CuApplication.getW() : newx=CuTWidgets.CuApplication.getW()-self.width()
 					if newy+self.height() > CuTWidgets.CuApplication.getH() : newy=CuTWidgets.CuApplication.getH()-self.height()
 					self.move(newx, newy);
+			self.update()
 
 
 

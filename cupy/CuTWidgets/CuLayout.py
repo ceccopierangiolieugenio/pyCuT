@@ -31,16 +31,19 @@ class CuLayoutItem:
 class CuLayout(CuLayoutItem):
 	def __init__(self):
 		CuLayoutItem.__init__(self)
-		self._widgets = []
+		self._items = []
 		self._parent = None
 		pass
 
+	def children(self):
+		return self._items
+
 	def count(self):
-		return len(self._widgets)
+		return len(self._items)
 
 	def itemAt(self, index):
-		if index < len(self._widgets):
-			return self._widgets[index]
+		if index < len(self._items):
+			return self._items[index]
 		return 0
 
 	def setParent(self, parent):
@@ -49,26 +52,58 @@ class CuLayout(CuLayoutItem):
 	def parentWidget(self):
 		return self._parent
 
+	def addItem(self, widget):
+		self._items.append(widget)
+
 	def addWidget(self, widget):
-		self._widgets.append(widget)
+		self.addItem(CuWidgetItem(widget))
 
 	def removeWidget(self, widget):
-		self._widgets.remove(widget)
+		for i in self._items:
+			if i.widget() == widget:
+				self._items.remove(i)
+				return
 
 	def update(self):
-		pass
-
-	def paint(self):
-		for widget in self._widgets:
-			widget.paint()
+		for i in self.children():
+			if isinstance(i, CuWidgetItem) and not i.isEmpty():
+				i.widget().update()
+			elif isinstance(i, CuLayout):
+				i.update()
 
 	def paintEvent(self, event):
-		for widget in self._widgets:
-			widget.paintEvent(event)
+		for item in self._items:
+			if isinstance(item, CuWidgetItem) and not item.isEmpty():
+				item.widget().paintEvent(event)
 
-	def event(self, evt):
-		for widget in self._widgets:
-			widget.event(evt)
+	def event(self, event):
+		for item in self._items:
+			if isinstance(item, CuWidgetItem) and not item.isEmpty():
+				item.widget().event(event)
+
+
+class CuWidgetItem(CuLayoutItem):
+	def __init__(self, widget):
+		CuLayoutItem.__init__(self)
+		self._widget = widget
+
+	def widget(self):
+		return self._widget
+
+	def isEmpty(self): return self._widget is None
+
+	def minimumSize(self):   return self._widget.minimumSize()
+	def minimumHeight(self): return self._widget.minimumHeight()
+	def minimumWidth(self):  return self._widget.minimumWidth()
+	def maximumSize(self):   return self._widget.maximumSize()
+	def maximumHeight(self): return self._widget.maximumHeight()
+	def maximumWidth(self):  return self._widget.maximumWidth()
+
+	def geometry(self):      return self._widget.geometry()
+
+	def setGeometry(self, x, y, w, h):
+		self._widget.setGeometry(x, y, w, h)
+
 
 
 class CuHBoxLayout(CuLayout):
@@ -78,7 +113,7 @@ class CuHBoxLayout(CuLayout):
 	def minimumWidth(self):
 		''' process the widgets and get the min size '''
 		minw = 0
-		for widget in self._widgets:
+		for widget in self._items:
 			w1  = widget.minimumWidth()
 			minw += w1
 		return minw
@@ -86,7 +121,7 @@ class CuHBoxLayout(CuLayout):
 	def minimumHeight(self):
 		''' process the widgets and get the min size '''
 		minh = CuLayout.minimumHeight(self)
-		for widget in self._widgets:
+		for widget in self._items:
 			h1  = widget.minimumHeight()
 			if h1 > minh : minh = h1
 		return minh
@@ -94,7 +129,7 @@ class CuHBoxLayout(CuLayout):
 	def maximumWidth(self):
 		''' process the widgets and get the min size '''
 		maxw = 0
-		for widget in self._widgets:
+		for widget in self._items:
 			w1 = widget.maximumWidth()
 			maxw += w1
 		return maxw
@@ -102,27 +137,31 @@ class CuHBoxLayout(CuLayout):
 	def maximumHeight(self):
 		''' process the widgets and get the min size '''
 		maxh = CuLayout.maximumHeight(self)
-		for widget in self._widgets:
+		for widget in self._items:
 			h1  = widget.maximumHeight()
 			if h1 < maxh : maxh = h1
 		return maxh
 
 	def update(self):
 		x, y, w, h = self.geometry()
-		numWidgets = len(self._widgets)
+		numWidgets = self.count()
 		leftWidgets = numWidgets
 		freeWidth = w
 		newx = x
-		for widget in self._widgets:
+		for item in self.children():
 			sliceSize = freeWidth//leftWidgets
-			maxw = widget.maximumWidth()
-			minw = widget.minimumWidth()
+			maxw = item.maximumWidth()
+			minw = item.minimumWidth()
 			if   sliceSize > maxw: sliceSize = maxw
 			elif sliceSize < minw: sliceSize = minw
-			widget.setGeometry(newx, y, sliceSize, h)
+			item.setGeometry(newx, y, sliceSize, h)
 			newx += sliceSize
 			freeWidth -= sliceSize
 			leftWidgets -= 1
+			if isinstance(item, CuWidgetItem) and not item.isEmpty():
+				item.widget().update()
+			elif isinstance(item, CuLayout):
+				item.update()
 
 
 class CuVBoxLayout(CuLayout):
@@ -132,7 +171,7 @@ class CuVBoxLayout(CuLayout):
 	def minimumWidth(self):
 		''' process the widgets and get the min size '''
 		minw = CuLayout.minimumWidth(self)
-		for widget in self._widgets:
+		for widget in self._items:
 			w1  = widget.minimumWidth()
 			if w1 > minw : minw = w1
 		return minw
@@ -140,7 +179,7 @@ class CuVBoxLayout(CuLayout):
 	def minimumHeight(self):
 		''' process the widgets and get the min size '''
 		minh = 0
-		for widget in self._widgets:
+		for widget in self._items:
 			h1  = widget.minimumHeight()
 			minh += h1
 		return minh
@@ -148,7 +187,7 @@ class CuVBoxLayout(CuLayout):
 	def maximumWidth(self):
 		''' process the widgets and get the min size '''
 		maxw = CuLayout.maximumWidth(self)
-		for widget in self._widgets:
+		for widget in self._items:
 			w1  = widget.maximumWidth()
 			if w1 < maxw : maxw = w1
 		return maxw
@@ -156,24 +195,28 @@ class CuVBoxLayout(CuLayout):
 	def maximumHeight(self):
 		''' process the widgets and get the min size '''
 		maxh = 0
-		for widget in self._widgets:
+		for widget in self._items:
 			h1 = widget.maximumHeight()
 			maxh += h1
 		return maxh
 
 	def update(self):
 		x, y, w, h = self.geometry()
-		numWidgets = len(self._widgets)
+		numWidgets = self.count()
 		leftWidgets = numWidgets
 		freeHeight = h
 		newy = y
-		for widget in self._widgets:
+		for item in self.children():
 			sliceSize = freeHeight//leftWidgets
-			maxh = widget.maximumHeight()
-			minh = widget.minimumHeight()
+			maxh = item.maximumHeight()
+			minh = item.minimumHeight()
 			if   sliceSize > maxh: sliceSize = maxh
 			elif sliceSize < minh: sliceSize = minh
-			widget.setGeometry(x, newy, w, sliceSize)
+			item.setGeometry(x, newy, w, sliceSize)
 			newy += sliceSize
 			freeHeight -= sliceSize
 			leftWidgets -= 1
+			if isinstance(item, CuWidgetItem) and not item.isEmpty():
+				item.widget().update()
+			elif isinstance(item, CuLayout):
+				item.update()
