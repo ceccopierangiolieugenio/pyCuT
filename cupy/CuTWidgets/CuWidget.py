@@ -139,7 +139,7 @@ class CuWidget:
 		self._data['x'] = newx
 		self._data['y'] = newy
 		# logging.debug(__name__ + "  Visible:    " + str(self._data['visible']))
-		logging.debug(__name__ + "  Move:    " + str((self._data['x'], self._data['y'],self._data['h'],self._data['w'])))
+		# logging.debug(__name__ + "  Move:    " + str((self._data['x'], self._data['y'],self._data['h'],self._data['w'])))
 		self._data['win'].move(self._data['x'], self._data['y'])
 
 	def resize(self, w, h):

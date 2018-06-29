@@ -3,7 +3,7 @@
 import sys
 
 from CuT import CuTCore, CuTWidgets
-from CuT.CuTCore import  CuT
+from CuT.CuTCore import  CuT, CuEvent
 from CuT.CuTGui import CuPainter
 from CuT.CuTHelper import CuWrapper
 
@@ -32,7 +32,7 @@ class CuTestInput(CuTWidgets.CuWidget):
 
 	def event(self, evt):
 		if isinstance(evt, CuTCore.CuMouseEvent):
-			self._id, self._ix, self._iy, self._iz, self._bstate = evt.getmouse()
+			self._ix, self._iy, self._bstate = evt.x(), evt.y(), evt.button()
 		self.update()
 
 class CuMovableTestInput(CuTestInput):
@@ -51,16 +51,16 @@ class CuMovableTestInput(CuTestInput):
 	def event(self, evt):
 		CuTestInput.event(self, evt)
 		if isinstance(evt, CuTCore.CuMouseEvent):
-			x, y = evt.globalPos()
-			if evt.getState() == evt.MOUSE_CLICKED:
-				self._state = "Clicked"
-			elif evt.getState() == evt.MOUSE_PRESSED:
+			x, y = evt.x(), evt.y()
+			#if evt.button() == CuEvent.MouseButtonPress:
+			#	self._state = "Clicked"
+			if evt.button() == CuEvent.MouseButtonPress:
 				self._state = "Pressed"
 				self._px, self._py = self.getPos()
 				self._mx, self._my = x, y
-			elif evt.getState() == evt.MOUSE_RELEASED:
+			elif evt.button() == CuEvent.MouseButtonRelease:
 				self._state = None
-			elif evt.getState() == evt.REPORT_MOUSE_POSITION:
+			elif evt.button() == CuEvent.MouseMove:
 				if self._state == "Pressed":
 					newx = self._px+x-self._mx
 					newy = self._py+y-self._my
