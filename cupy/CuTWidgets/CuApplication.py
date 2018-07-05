@@ -166,7 +166,7 @@ class CuApplication:
 						button = CuEvent.MouseMove
 						btype = CuT.NoButton
 
-				mwx, mwy = CuApplication.GLBL['mainWidget'].getPos()
+				mwx, mwy = CuApplication.GLBL['mainWidget'].pos()
 				evt = CuMouseEvent(
 						type=btype,
 						localPos  = {'x':x-mwx, 'y':y-mwy},

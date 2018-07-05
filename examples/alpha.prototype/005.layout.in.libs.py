@@ -58,18 +58,18 @@ class CuMovableTestInput(CuTestInput):
 		qp.drawText(3, 2, "[MOVABLE] " + str(self._state) + "    ")
 		qp.end()
 
+	def mousePressEvent(self, evt):
+		self._state = "Pressed"
+		self._px, self._py = self.pos()
+		self._mx, self._my = evt.screenPos()
+
+	def mouseReleaseEvent(self, evt):
+		self._state = None
+
 	def event(self, evt):
 		if isinstance(evt, CuTCore.CuMouseEvent):
 			x, y = evt.screenPos()
-			#if evt.button() == CuEvent.MouseButtonPress:
-			#	self._state = "Clicked"
-			if evt.button() == CuEvent.MouseButtonPress:
-				self._state = "Pressed"
-				self._px, self._py = self.getPos()
-				self._mx, self._my = x, y
-			elif evt.button() == CuEvent.MouseButtonRelease:
-				self._state = None
-			elif evt.button() == CuEvent.MouseMove:
+			if evt.button() == CuEvent.MouseMove:
 				if self._state == "Pressed":
 					newx = self._px+x-self._mx
 					newy = self._py+y-self._my

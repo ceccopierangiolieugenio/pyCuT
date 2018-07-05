@@ -71,25 +71,45 @@ class CuWidget:
 		if self._data['layout'] is not None:
 			self._data['layout'].paintEvent(event)
 
+	def mouseDoubleClickEvent(self, evt): pass
+	def mouseMoveEvent(self, evt): pass
+	def mousePressEvent(self, evt): pass
+	def mouseReleaseEvent(self, evt): pass
+
 	def event(self, evt):
+		# handle own events
+		if evt.type() == CuT.LeftButton or evt.type() == CuT.RightButton or evt.type() == CuT.MidButton:
+			if   evt.button() == CuEvent.MouseButtonRelease:
+				self.mouseReleaseEvent(evt)
+			elif evt.button() == CuEvent.MouseButtonPress:
+				self.mousePressEvent(evt)
+		if evt.type() == CuT.NoButton:
+			if evt.button() == CuEvent.MouseMove:
+				self.mouseMoveEvent(evt)
+
+		# Trigger this event to the childs
 		if self._data['layout'] is not None:
 			for i in range(self._data['layout'].count()):
 				item = self._data['layout'].itemAt(i)
 				if isinstance(item, CuWidgetItem) and not item.isEmpty():
 					widget = item.widget()
-					wevt = evt
 					if isinstance(evt, CuMouseEvent):
-						wx,  wy  = widget.getPos()
-						# ex,  ey  = evt.pos()
+						wx, wy = widget.pos()
+						ww, wh = widget.size()
 						ewx, ewy = evt.windowPos()
 						esx, esy = evt.screenPos()
-						wevt = CuMouseEvent(
-							type=evt.type(),
-							localPos  = {'x':esx-wx, 'y':esy-wy},
-							windowPos = {'x':ewx, 'y':ewy},
-							screenPos = {'x':esx, 'y':esy},
-							button=evt.button())
-					if widget.event(wevt): return True
+						lx, ly = esx-wx, esy-wy
+						if lx >= 0 and ly >= 0 and lx < ww and ly < wh:
+							# ex,  ey  = evt.pos()
+							wevt = CuMouseEvent(
+								type=evt.type(),
+								localPos  = {'x':lx,  'y':ly},
+								windowPos = {'x':ewx, 'y':ewy},
+								screenPos = {'x':esx, 'y':esy},
+								button=evt.button())
+							if widget.event(wevt): return True
+						continue
+					if widget.event(evt): return True
 
 
 	def setLayout(self, layout):
@@ -109,7 +129,7 @@ class CuWidget:
 	def width(self):  return self._data['w']
 	def height(self): return self._data['h']
 
-	def getPos(self): return self._data['x'], self._data['y']
+	def pos(self): return self._data['x'], self._data['y']
 	def size(self):   return self._data['w'], self._data['h']
 
 	def maximumSize(self):
