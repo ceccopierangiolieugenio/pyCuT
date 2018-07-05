@@ -166,7 +166,13 @@ class CuApplication:
 						button = CuEvent.MouseMove
 						btype = CuT.NoButton
 
-				evt = CuMouseEvent(type=btype, localPos = {'x':x, 'y':y},  button=button)
+				mwx, mwy = CuApplication.GLBL['mainWidget'].getPos()
+				evt = CuMouseEvent(
+						type=btype,
+						localPos  = {'x':x-mwx, 'y':y-mwy},
+						windowPos = {'x':x-mwx, 'y':y-mwy},
+						screenPos = {'x':x,     'y':y},
+						button=button)
 
 			if event == curses.KEY_RESIZE:
 				CuApplication.refreshMain()

@@ -161,7 +161,10 @@ class CuEvent:
 	ZOrderChange = 126     # The widget's z-order has changed. This event is never sent to top level windows.
 
 	def __init__(self, type=None):
-		self.type = type;
+		self._type = type;
+
+	def type(self):
+		return self._type
 
 
 ''' CuMouseEvent
@@ -175,29 +178,37 @@ class CuMouseEvent(CuEvent):
 		self._localPos  = localPos
 		self._windowPos = windowPos
 		self._screenPos = screenPos
+		self._globalPos = screenPos
 		self._button=button
 
 	def globalPos(self):
-		return self.globalX(), self.globalY()
+		return self._globalPos['x'], self._globalPos['y']
 
+	# Returns the global x position of the mouse cursor at the time of the event.
 	def globalX(self):
-		return self._x
+		return self._globalPos['x']
 
+	# Returns the global y position of the mouse cursor at the time of the event.
 	def globalY(self):
-		return self._y
+		return self._globalPos['y']
 
+	# Returns the position of the mouse cursor, relative to the widget that received the event.
 	def pos(self):
 		return self.x(), self.y()
 
+	# Returns the position of the mouse cursor as a Point, relative to the screen that received the event.
 	def screenPos(self):
 		return self._screenPos['x'], self._screenPos['y']
 
+	# Returns the position of the mouse cursor as a Point, relative to the window that received the event.
 	def windowPos(self):
 		return self._windowPos['x'], self._windowPos['y']
 
+	# Returns the x position of the mouse cursor, relative to the widget that received the event.
 	def x(self):
 		return self._localPos['x']
 
+	# Returns the y position of the mouse cursor, relative to the widget that received the event.
 	def y(self):
 		return self._localPos['y']
 

@@ -5,9 +5,11 @@
 import logging
 import os
 from CuT.CuTHelper import CuWrapper
+from CuT.CuTCore import CuEvent, CuMouseEvent
 
 from .CuLayout import *
 from .CuApplication import *
+
 
 
 class CuWidget:
@@ -71,7 +73,24 @@ class CuWidget:
 
 	def event(self, evt):
 		if self._data['layout'] is not None:
-			self._data['layout'].event(evt)
+			for i in range(self._data['layout'].count()):
+				item = self._data['layout'].itemAt(i)
+				if isinstance(item, CuWidgetItem) and not item.isEmpty():
+					widget = item.widget()
+					wevt = evt
+					if isinstance(evt, CuMouseEvent):
+						wx,  wy  = widget.getPos()
+						# ex,  ey  = evt.pos()
+						ewx, ewy = evt.windowPos()
+						esx, esy = evt.screenPos()
+						wevt = CuMouseEvent(
+							type=evt.type(),
+							localPos  = {'x':esx-wx, 'y':esy-wy},
+							windowPos = {'x':ewx, 'y':ewy},
+							screenPos = {'x':esx, 'y':esy},
+							button=evt.button())
+					if widget.event(wevt): return True
+
 
 	def setLayout(self, layout):
 		if isinstance(layout, CuLayout):
@@ -96,28 +115,40 @@ class CuWidget:
 	def maximumSize(self):
 		return self.maximumWidth(), self.maximumHeight()
 	def maximumHeight(self):
+		wMaxH = self._extra['maxh'] + 2*self._data['borderSize']
+		lMaxH = 1000000
 		if self._data['layout'] is not None:
-			return self._data['layout'].maximumHeight() + 2*self._data['borderSize']
-		else:
-			return self._extra['maxh'] + 2*self._data['borderSize']
+			lMaxH = self._data['layout'].maximumHeight() + 2*self._data['borderSize']
+			if lMaxH < wMaxH:
+				return lMaxH
+		return wMaxH
 	def maximumWidth(self):
+		wMaxW = self._extra['maxw'] + 2*self._data['borderSize']
+		lMaxW = 1000000
 		if self._data['layout'] is not None:
-			return self._data['layout'].maximumWidth() + 2*self._data['borderSize']
-		else:
-			return self._extra['maxw'] + 2*self._data['borderSize']
+			lMaxW = self._data['layout'].maximumWidth() + 2*self._data['borderSize']
+			if lMaxW < wMaxW:
+				return lMaxW
+		return wMaxW
 
 	def minimumSize(self):
 		return self.minimumWidth(), self.minimumHeight()
 	def minimumHeight(self):
+		wMinH = self._extra['minh'] + 2*self._data['borderSize']
+		lMinH = 1000000
 		if self._data['layout'] is not None:
-			return self._data['layout'].minimumHeight() + 2*self._data['borderSize']
-		else:
-			return self._extra['minh'] + 2*self._data['borderSize']
+			lMinH = self._data['layout'].minimumHeight() + 2*self._data['borderSize']
+			if lMinH > wMinH:
+				return lMinH
+		return wMinH
 	def minimumWidth(self):
+		wMinW = self._extra['minw'] + 2*self._data['borderSize']
+		lMinW = 1000000
 		if self._data['layout'] is not None:
-			return self._data['layout'].minimumWidth() + 2*self._data['borderSize']
-		else:
-			return self._extra['minw'] + 2*self._data['borderSize']
+			lMinW = self._data['layout'].minimumWidth() + 2*self._data['borderSize']
+			if lMinW > wMinW:
+				return lMinW
+		return wMinW
 
 	def setMaximumSize(self, maxw, maxh): self._extra['maxw'] = maxw; self._extra['maxh'] = maxh
 	def setMaximumHeight(self, maxh):     self._extra['maxh'] = maxh
