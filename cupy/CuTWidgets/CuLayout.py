@@ -52,8 +52,8 @@ class CuLayout(CuLayoutItem):
 	def parentWidget(self):
 		return self._parent
 
-	def addItem(self, widget):
-		self._items.append(widget)
+	def addItem(self, item):
+		self._items.append(item)
 
 	def addWidget(self, widget):
 		self.addItem(CuWidgetItem(widget))
@@ -72,15 +72,11 @@ class CuLayout(CuLayoutItem):
 				i.update()
 
 	def paintEvent(self, event):
-		for item in self._items:
-			if isinstance(item, CuWidgetItem) and not item.isEmpty():
-				item.widget().paintEvent(event)
-
-	def event(self, event):
-		for item in self._items:
-			if isinstance(item, CuWidgetItem) and not item.isEmpty():
-				item.widget().event(event)
-
+		for i in self.children():
+			if isinstance(i, CuWidgetItem) and not i.isEmpty():
+				i.widget().paintEvent(event)
+			elif isinstance(i, CuLayout):
+					i.paintEvent(event)
 
 class CuWidgetItem(CuLayoutItem):
 	def __init__(self, widget):

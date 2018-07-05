@@ -76,6 +76,36 @@ class CuWidget:
 	def mousePressEvent(self, evt): pass
 	def mouseReleaseEvent(self, evt): pass
 
+	@staticmethod
+	def _eventLayoutHandle(evt, layout):
+		for i in range(layout.count()):
+			item = layout.itemAt(i)
+			if isinstance(item, CuWidgetItem) and not item.isEmpty():
+				widget = item.widget()
+				if isinstance(evt, CuMouseEvent):
+					wx, wy = widget.pos()
+					ww, wh = widget.size()
+					ewx, ewy = evt.windowPos()
+					esx, esy = evt.screenPos()
+					lx, ly = esx-wx, esy-wy
+					# Skip the mouse event if outside this widget
+					if lx >= 0 and ly >= 0 and lx < ww and ly < wh:
+						# ex,  ey  = evt.pos()
+						wevt = CuMouseEvent(
+							type=evt.type(),
+							localPos  = {'x':lx,  'y':ly},
+							windowPos = {'x':ewx, 'y':ewy},
+							screenPos = {'x':esx, 'y':esy},
+							button=evt.button())
+						if widget.event(wevt): return True
+					continue
+				if widget.event(evt):
+					return True
+			elif isinstance(item, CuLayout):
+				if CuWidget._eventLayoutHandle(evt, item):
+					return True
+		return False
+
 	def event(self, evt):
 		# handle own events
 		if evt.type() == CuT.LeftButton or evt.type() == CuT.RightButton or evt.type() == CuT.MidButton:
@@ -89,27 +119,7 @@ class CuWidget:
 
 		# Trigger this event to the childs
 		if self._data['layout'] is not None:
-			for i in range(self._data['layout'].count()):
-				item = self._data['layout'].itemAt(i)
-				if isinstance(item, CuWidgetItem) and not item.isEmpty():
-					widget = item.widget()
-					if isinstance(evt, CuMouseEvent):
-						wx, wy = widget.pos()
-						ww, wh = widget.size()
-						ewx, ewy = evt.windowPos()
-						esx, esy = evt.screenPos()
-						lx, ly = esx-wx, esy-wy
-						if lx >= 0 and ly >= 0 and lx < ww and ly < wh:
-							# ex,  ey  = evt.pos()
-							wevt = CuMouseEvent(
-								type=evt.type(),
-								localPos  = {'x':lx,  'y':ly},
-								windowPos = {'x':ewx, 'y':ewy},
-								screenPos = {'x':esx, 'y':esy},
-								button=evt.button())
-							if widget.event(wevt): return True
-						continue
-					if widget.event(evt): return True
+			return CuWidget._eventLayoutHandle(evt, self._data['layout'])
 
 
 	def setLayout(self, layout):
@@ -244,23 +254,35 @@ class CuWidget:
 	#def setMaximumSize(self, maxw: int, maxh: int): pass
 	#def setMinimumSize(self, minw: int, minh: int): pass
 
+	@staticmethod
+	def _showHandle(layout):
+		for i in range(layout.count()):
+			item = layout.itemAt(i)
+			if isinstance(item, CuWidgetItem) and not item.isEmpty():
+				item.widget().show()
+			elif isinstance(item, CuLayout):
+				CuWidget._showHandle(item)
+
 	def show(self):
 		self._data['win'].show()
 		self._data['visible'] = True
 		if self._data['layout'] is not None:
-			for i in range(self._data['layout'].count()):
-				item = self._data['layout'].itemAt(i)
-				if isinstance(item, CuWidgetItem) and not item.isEmpty():
-					item.widget().show()
+			CuWidget._showHandle(self._data['layout'])
+
+	@staticmethod
+	def _hideHandle(layout):
+		for i in range(layout.count()):
+			item = layout.itemAt(i)
+			if isinstance(item, CuWidgetItem) and not item.isEmpty():
+				item.widget().hide()
+			elif isinstance(item, CuLayout):
+				CuWidget._hideHandle(item)
 
 	def hide(self):
 		self._data['win'].hide()
 		self._data['visible'] = False
 		if self._data['layout'] is not None:
-			for i in range(self._data['layout'].count()):
-				item = self._data['layout'].itemAt(i)
-				if isinstance(item, CuWidgetItem) and not item.isEmpty():
-					item.widget().hide()
+			CuWidget._hideHandle(self._data['layout'])
 
 	def isVisible(self):
 		return self._data['visible']

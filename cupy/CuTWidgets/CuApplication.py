@@ -177,5 +177,6 @@ class CuApplication:
 			if event == curses.KEY_RESIZE:
 				CuApplication.refreshMain()
 
-			CuApplication.GLBL['mainWidget'].event(evt)
+			if evt is not None:
+				CuApplication.GLBL['mainWidget'].event(evt)
 		return 0

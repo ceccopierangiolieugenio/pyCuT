@@ -98,9 +98,18 @@ def main(screen):
 	tw1.setBorder(True)
 	layout.addWidget(tw1)
 
+
+	vlayout2 = CuTWidgets.CuVBoxLayout()
+
 	tw2 = CuTestInput(parent=mw, name='tw2')
 	tw2.setBorder(True)
-	layout.addWidget(tw2)
+	vlayout2.addWidget(tw2)
+
+	tw2_1 = CuTestInput(parent=mw, name='tw2.1')
+	tw2_1.setBorder(True)
+	vlayout2.addWidget(tw2_1)
+
+	layout.addItem(vlayout2)
 
 	vlayout = CuTWidgets.CuVBoxLayout()
 	p1 = CuTWidgets.CuPanel(parent=mw, name='p1')
