@@ -4,6 +4,7 @@
   [ ] Mouse Weel, Right Mouse
   [ ] Set and Remove Border
   [ ] Mouse Move on Putty
+  [ ] CuWidget.py [Event] Handle MouseEvent in nested layout
 
 # [ ] Better Update Layout
          In the Widget the update routine is redunndant (border check)
@@ -13,4 +14,8 @@
 
 # Misc
   [ ] Get rid of ncurses
+
+# Api
+#  CuWidget
+  [ ] Clean move, resize (apply also to layout)
 

@@ -68,9 +68,7 @@ class CuPainter:
 		x, y = 0, 0
 		w, h = self._device.size()
 		strlen = len(text)
-		bordersize = 0
-		if self._device.border(): bordersize = 1
 		# if (ty<y) or (ty>y+h-1) or (tx>x+w-1) or (tx+strlen<x): return
-		if (ty<y) or (ty>y+h-bordersize-1) or (tx>x+w-bordersize-1) or (tx+strlen<x): return
-		if (tx+strlen>x+w-bordersize): text = text[:(x+w-bordersize-tx)]
+		if (ty<y) or (ty>y+h-1) or (tx>x+w-1) or (tx+strlen<x): return
+		if (tx+strlen>x+w): text = text[:(x+w-tx)]
 		self._device.getWin().drawString(tx, ty, text, self._pen['fg'], self._pen['bg'])

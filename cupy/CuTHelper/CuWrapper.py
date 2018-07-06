@@ -53,7 +53,19 @@ class CuWin:
 		elif fg == CuT.darkMagenta: c = curses.color_pair(1 + curses.COLOR_MAGENTA + curses.COLOR_BLACK * 8) | curses.A_DIM
 		elif fg == CuT.darkYellow:  c = curses.color_pair(1 + curses.COLOR_YELLOW  + curses.COLOR_BLACK * 8) | curses.A_DIM
 		elif fg == CuT.transparent: pass
-		self._win.addstr(y, x, str, c)
+		''' Corner case:
+			if the last character of the string goes in the end
+			of the window (lower right edge), the cursor goes "off screen"
+			and NCurses return an error
+		'''
+		h,w = self._win.getmaxyx()
+		strlen = len(str)
+		if y == h-1:
+			self._win.addnstr(y, x, str[:strlen-2], strlen,c)
+			self._win.addch(y,x+strlen-2,str[strlen-1],c)
+			self._win.insch(y,x+strlen-2,str[strlen-2],c)
+		else:
+			self._win.addstr(y, x, str, c)
 
 
 class CuWrapper:

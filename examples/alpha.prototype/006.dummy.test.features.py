@@ -7,12 +7,14 @@ from CuT.CuTCore import  CuT, CuEvent
 from CuT.CuTGui import CuPainter
 from CuT.CuTHelper import CuWrapper
 
-class CuTestInput(CuTWidgets.CuWidget):
+class CuTestInput(CuTWidgets.CuFrame):
+#class CuTestInput(CuTWidgets.CuWidget):
 	_id, _ix, _iy, _iz, _bstate = 0, 0, 0, 0, 0
 	_gx, _gy, _sx, _sy, _wx, _wy = 0, 0, 0, 0, 0, 0
 
 	def __init__(self, *args, **kwargs):
-		CuTWidgets.CuWidget.__init__(self, *args, **kwargs)
+		CuTWidgets.CuFrame.__init__(self, *args, **kwargs)
+		#CuTWidgets.CuWidget.__init__(self, *args, **kwargs)
 
 	def paintEvent(self, event):
 		qp = CuPainter()
@@ -56,6 +58,8 @@ class CuMovableTestInput(CuTestInput):
 		qp.begin(self)
 		qp.setPen(CuT.blue)
 		qp.drawText(3, 2, "[MOVABLE] " + str(self._state) + "    ")
+		qp.drawText(3, 19, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		# qp.drawText(3, 19, "abc")
 		qp.end()
 
 	def mousePressEvent(self, evt):
@@ -90,34 +94,44 @@ def main(screen):
 	mw = CuTWidgets.CuMainWindow()
 	mw.setMaximumSize(180,50)
 	mw.setMinimumSize(60,30)
+	#mw.setBorder(True)
 
 	layout = CuTWidgets.CuHBoxLayout()
 
 	tw1 = CuTestInput(parent=mw, name='tw1')
+	#tw1.setBorder(True)
 	layout.addWidget(tw1)
 
 
 	vlayout2 = CuTWidgets.CuVBoxLayout()
 
 	tw2 = CuTestInput(parent=mw, name='tw2')
+	#tw2.setBorder(True)
 	vlayout2.addWidget(tw2)
 
 	tw2_1 = CuTestInput(parent=mw, name='tw2.1')
+	#tw2_1.setBorder(True)
 	vlayout2.addWidget(tw2_1)
 
 	layout.addItem(vlayout2)
 
 	vlayout = CuTWidgets.CuVBoxLayout()
 	f1 = CuTWidgets.CuFrame(parent=mw, name='f1')
+	#f1.setBorder(True)
 	layout.addWidget(f1)
 
 	tw4 = CuTestInput(parent=mw, name='tw4')
+	#tw4.setBorder(True)
 	layout.addWidget(tw4)
 
 	tw3 = CuTestInput(parent=f1, name='tw3')
+	#tw3.setBorder(True)
+	#tw3.setLineWidth(0)
 	vlayout.addWidget(tw3)
 
 	mtw1 = CuMovableTestInput(parent=f1, name='mtw1')
+	#mtw1.setBorder(True)
+	#mtw1.setLineWidth(0)
 	vlayout.addWidget(mtw1)
 
 	mw.setLayout(layout)

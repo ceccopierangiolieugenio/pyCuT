@@ -2,7 +2,6 @@
     Event
 '''
 
-import curses, curses.panel
 import logging
 
 from .CuT import CuT
@@ -174,7 +173,6 @@ class CuMouseEvent(CuEvent):
 	_x, _y = 0, 0
 	def __init__(self, type=None, localPos={'x':0, 'y':0}, windowPos={'x':0, 'y':0}, screenPos={'x':0, 'y':0}, button=CuT.NoButton):
 		CuEvent.__init__(self, type=type )
-		# self._id, self._x, self._y, self._z, self._bstate = curses.getmouse()
 		self._localPos  = localPos
 		self._windowPos = windowPos
 		self._screenPos = screenPos

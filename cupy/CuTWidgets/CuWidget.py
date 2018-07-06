@@ -41,8 +41,6 @@ class CuWidget:
 		self._data['childs'] = []
 		self._data['win'] = CuWrapper.newWin(self._data['x'], self._data['y'], self._data['w'], self._data['h'])
 		self._data['layout'] = None
-		self._data['border'] = False
-		self._data['borderSize'] = 0
 		self.hide()
 
 	def accessibleName(self):
@@ -50,19 +48,6 @@ class CuWidget:
 
 	def setAccessibleName(self, name):
 		self._data['name'] = name
-
-
-	def border(self):
-		return self._data['border']
-
-	def setBorder(self, bool):
-		self._data['border'] = bool
-		if bool:
-			self._data['borderSize'] = 1
-			self._data['win'].box()
-		else:
-			self._data['borderSize'] = 0
-			self._data['win'].clear()
 
 	def getWin(self):
 		return self._data['win']
@@ -126,8 +111,7 @@ class CuWidget:
 		if isinstance(layout, CuLayout):
 			self._data['layout'] = layout
 			self._data['layout'].setParent(self)
-			bs = self._data['borderSize']
-			self._data['layout'].setGeometry(self._data['x']+bs, self._data['y']+bs, self.width(), self.height())
+			self._data['layout'].setGeometry(self._data['x'], self._data['y'], self.width(), self.height())
 			self._data['layout'].update()
 		else:
 			raise Exception(str(layout) + ' not of type CuLayout')
@@ -145,18 +129,18 @@ class CuWidget:
 	def maximumSize(self):
 		return self.maximumWidth(), self.maximumHeight()
 	def maximumHeight(self):
-		wMaxH = self._extra['maxh'] + 2*self._data['borderSize']
+		wMaxH = self._extra['maxh']
 		lMaxH = 1000000
 		if self._data['layout'] is not None:
-			lMaxH = self._data['layout'].maximumHeight() + 2*self._data['borderSize']
+			lMaxH = self._data['layout'].maximumHeight()
 			if lMaxH < wMaxH:
 				return lMaxH
 		return wMaxH
 	def maximumWidth(self):
-		wMaxW = self._extra['maxw'] + 2*self._data['borderSize']
+		wMaxW = self._extra['maxw']
 		lMaxW = 1000000
 		if self._data['layout'] is not None:
-			lMaxW = self._data['layout'].maximumWidth() + 2*self._data['borderSize']
+			lMaxW = self._data['layout'].maximumWidth()
 			if lMaxW < wMaxW:
 				return lMaxW
 		return wMaxW
@@ -164,18 +148,18 @@ class CuWidget:
 	def minimumSize(self):
 		return self.minimumWidth(), self.minimumHeight()
 	def minimumHeight(self):
-		wMinH = self._extra['minh'] + 2*self._data['borderSize']
+		wMinH = self._extra['minh']
 		lMinH = 1000000
 		if self._data['layout'] is not None:
-			lMinH = self._data['layout'].minimumHeight() + 2*self._data['borderSize']
+			lMinH = self._data['layout'].minimumHeight()
 			if lMinH > wMinH:
 				return lMinH
 		return wMinH
 	def minimumWidth(self):
-		wMinW = self._extra['minw'] + 2*self._data['borderSize']
+		wMinW = self._extra['minw']
 		lMinW = 1000000
 		if self._data['layout'] is not None:
-			lMinW = self._data['layout'].minimumWidth() + 2*self._data['borderSize']
+			lMinW = self._data['layout'].minimumWidth()
 			if lMinW > wMinW:
 				return lMinW
 		return wMinW
@@ -215,9 +199,6 @@ class CuWidget:
 		self._data['win'].clear()
 		self._data['win'].resize(self._data['w'],self._data['h'])
 
-		if self._data['border']:
-			self._data['win'].box()
-
 	def setGeometry(self, x, y, w, h):
 		# logging.debug("FROM:"+str({"SELF":self._data['name'], "x":x,"y":y,"w":w,"h":h}))
 		# logging.debug("TO:  "+str({"SELF":self._data['name'], "x":self._data['x'],"y":self._data['y'],"w":self._data['w'],"h":self._data['h}']))
@@ -247,8 +228,7 @@ class CuWidget:
 			self.move(x, y)
 
 		if self._data['layout'] is not None:
-			bs = self._data['borderSize']
-			self._data['layout'].setGeometry(self._data['x']+bs, self._data['y']+bs, self._data['w']-2*bs, self._data['h']-2*bs)
+			self._data['layout'].setGeometry(self._data['x'], self._data['y'], self._data['w'], self._data['h'])
 			self._data['layout'].update()
 
 	#def setMaximumSize(self, maxw: int, maxh: int): pass
@@ -291,12 +271,3 @@ class CuWidget:
 		CuApplication.addUpdateWidget(self)
 		if self._data['layout'] is not None:
 			self._data['layout'].update()
-
-
-class CuMainWindow(CuWidget):
-	def __init__(self, *args, **kwargs):
-		CuWidget.__init__(self, *args, **kwargs)
-
-class CuPanel(CuWidget):
-	def __init__(self, *args, **kwargs):
-		CuWidget.__init__(self, *args, **kwargs)
