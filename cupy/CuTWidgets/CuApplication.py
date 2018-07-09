@@ -7,7 +7,7 @@ import logging
 
 from CuT.CuTCore import  CuT
 from CuT.CuTCore import CuEvent, CuMouseEvent
-from CuT.CuTHelper import CuWrapper
+from CuT.CuTHelper import CuWrapper, CuHelper
 
 class CuApplication:
 	GLBL = {
@@ -29,6 +29,8 @@ class CuApplication:
 		curses.mouseinterval(0)
 		CuApplication.GLBL['screen'] = screen
 		CuApplication.GLBL['maxY'], CuApplication.GLBL['maxX'] = screen.getmaxyx()
+		logging.debug("SCREEN: W:"+str(CuApplication.GLBL['maxX'])+" H:"+str(CuApplication.GLBL['maxY']))
+
 
 		CuWrapper.initWrapper()
 		CuWrapper.__CuInit__()
@@ -66,6 +68,7 @@ class CuApplication:
 		for widget in CuApplication._updateWidget:
 			widget.paintEvent(None)
 		CuApplication._updateWidget = []
+		CuHelper.execPaint()
 		curses.panel.update_panels()
 		CuApplication.GLBL['screen'].refresh()
 
@@ -94,7 +97,7 @@ class CuApplication:
 		else: maxw = CuApplication.GLBL['maxX']
 
 		if CuApplication.GLBL['maxY'] > maxh : y = (CuApplication.GLBL['maxY']-maxh )//2
-		else: maxh = CuApplication.GLBL['maxX']
+		else: maxh = CuApplication.GLBL['maxY']
 
 		CuApplication.GLBL['mainWidget'].setGeometry(x, y, maxw, maxh)
 		CuApplication.GLBL['mainWidget'].show()
@@ -113,12 +116,14 @@ class CuApplication:
 				event = CuApplication.GLBL['screen'].getch()
 			except KeyboardInterrupt as e:
 				# print "getch: " + str(e)
-				logging.debug(__name__ + " getch: " + str(e))
+				logging.debug(__name__ + " KI getch: " + str(e))
 				event = curses.ERR
+				continue
 			except Exception as e:
 				# print "getch: " + str(e)
-				logging.debug(__name__ + " getch: " + str(e))
+				logging.debug(__name__ + " Exc getch: " + str(e))
 				event = curses.ERR
+				continue
 
 			if event == curses.ERR: break
 			if event == ord("q"): break

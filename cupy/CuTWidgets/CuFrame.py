@@ -20,26 +20,19 @@ class CuFrame(CuWidget):
 	def __init__(self, *args, **kwargs):
 		self._lineWidth = 1
 		CuWidget.__init__(self, *args, **kwargs)
-		self._data['win'].box()
 
-	
 	def lineWidth(self):
 		return self._lineWidth
 
 	def setLineWidth(self, w):
 		self._lineWidth = w
-		if w == 0:
-			self._data['win'].clear()
-		elif w > 0:
-			self._data['win'].box()
+		self.update()
 
 	def setLayout(self, layout):
 		if isinstance(layout, CuLayout):
 			lw = self._lineWidth
 			CuWidget.setLayout(self, layout)
-			self.layout().setGeometry(
-									self.x()+lw, self.y()+lw,
-									self.width()-2*lw, self.height()-2*lw )
+			self.layout().setGeometry(lw, lw, self.width()-2*lw, self.height()-2*lw )
 			self.layout().update()
 		else:
 			raise Exception(str(layout) + ' not of type CuLayout')
@@ -57,22 +50,19 @@ class CuFrame(CuWidget):
 		CuWidget.resize(self, w, h)
 		if self.layout() is not None:
 			lw = self._lineWidth
-			self.layout().setGeometry(
-									self.x()+lw, self.y()+lw,
-									self.width()-2*lw, self.height()-2*lw )
-		if self._lineWidth > 0:
-			self._data['win'].box()
+			self.layout().setGeometry(lw, lw, self.width()-2*lw, self.height()-2*lw )
 
 	def setGeometry(self, x, y, w, h):
 		CuWidget.setGeometry(self, x, y, w, h)
 		if self.layout() is not None:
 			lw = self._lineWidth
-			self.layout().setGeometry(
-									self.x()+lw, self.y()+lw,
-									self.width()-2*lw, self.height()-2*lw )
+			self.layout().setGeometry(lw, lw, self.width()-2*lw, self.height()-2*lw )
 			self.layout().update()
+
+	def paintEvent(self, event):
 		if self._lineWidth > 0:
 			self._data['win'].box()
+		CuWidget.paintEvent(self, event)
 
 class CuMainWindow(CuFrame):
 	def __init__(self, *args, **kwargs):

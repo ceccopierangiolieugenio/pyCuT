@@ -4,7 +4,7 @@
 
 import logging
 import os
-from CuT.CuTHelper import CuWrapper
+from CuT.CuTHelper import CuWrapper, CuHelper
 from CuT.CuTCore import CuEvent, CuMouseEvent
 
 from .CuLayout import *
@@ -39,7 +39,7 @@ class CuWidget:
 		if 'h' in kwargs: self._data['h'] = kwargs['h']
 		else : self._data['h'] = CuApplication.getH()
 		self._data['childs'] = []
-		self._data['win'] = CuWrapper.newWin(self._data['x'], self._data['y'], self._data['w'], self._data['h'])
+		self._data['win'] = CuWrapper.newWin(self, self._data['x'], self._data['y'], self._data['w'], self._data['h'])
 		self._data['layout'] = None
 		self.hide()
 
@@ -68,7 +68,7 @@ class CuWidget:
 			if isinstance(item, CuWidgetItem) and not item.isEmpty():
 				widget = item.widget()
 				if isinstance(evt, CuMouseEvent):
-					wx, wy = widget.pos()
+					wx, wy = CuHelper.absPos(widget)
 					ww, wh = widget.size()
 					ewx, ewy = evt.windowPos()
 					esx, esy = evt.screenPos()
@@ -111,12 +111,17 @@ class CuWidget:
 		if isinstance(layout, CuLayout):
 			self._data['layout'] = layout
 			self._data['layout'].setParent(self)
-			self._data['layout'].setGeometry(self._data['x'], self._data['y'], self.width(), self.height())
+			self._data['layout'].setGeometry(0, 0, self.width(), self.height())
 			self._data['layout'].update()
 		else:
 			raise Exception(str(layout) + ' not of type CuLayout')
 
 	def layout(self): return self._data['layout']
+
+	def setParent(self, parent):
+		self._data['parent'] = parent
+	def parentWidget(self):
+		return self._data['parent']
 
 	def x(self): return self._data['x']
 	def y(self): return self._data['y']
@@ -173,66 +178,25 @@ class CuWidget:
 	def setMinimumWidth(self, minw):      self._extra['minw'] = minw
 
 	def move(self, x, y):
-		# self._data['win'].clear()
-		# logging.debug(__name__ + "x:" + str(self._data['x']) + " y:" + str(self._data['y']))
-		newx = x
-		newy = y
-		if newx < 0: newx=0
-		if newy < 0: newy=0
-		if newx+self._data['w'] > CuApplication.getW() : newx=CuApplication.getW()-self._data['w']
-		if newy+self._data['h'] > CuApplication.getH() : newy=CuApplication.getH()-self._data['h']
-		self._data['x'] = newx
-		self._data['y'] = newy
-		# logging.debug(__name__ + "  Visible:    " + str(self._data['visible']))
-		# logging.debug(__name__ + "  Move:    " + str((self._data['x'], self._data['y'],self._data['h'],self._data['w'])))
+		self._data['x'] = x
+		self._data['y'] = y
 		self._data['win'].move(self._data['x'], self._data['y'])
-
-	def resize(self, w, h):
-		neww = w
-		newh = h
-		if neww < 0: neww=0
-		if newh < 0: newh=0
-		if neww+self._data['x'] > CuApplication.getW() : neww=CuApplication.getW()-self._data['x']
-		if newh+self._data['y'] > CuApplication.getH() : newh=CuApplication.getH()-self._data['y']
-		self._data['w'] = neww
-		self._data['h'] = newh
-		self._data['win'].clear()
-		self._data['win'].resize(self._data['w'],self._data['h'])
-
-	def setGeometry(self, x, y, w, h):
-		# logging.debug("FROM:"+str({"SELF":self._data['name'], "x":x,"y":y,"w":w,"h":h}))
-		# logging.debug("TO:  "+str({"SELF":self._data['name'], "x":self._data['x'],"y":self._data['y'],"w":self._data['w'],"h":self._data['h}']))
-		if self._data['w'] == w and self._data['h'] == h:
-			if self._data['x'] != x or self._data['y'] != y:
-				'''
-					Little Hack to avoid a crash if exiting from the "Too Small Menu"
-					self._data['visible']
-
-				'''
-				self.resize(w, h)
-				self.move(x, y)
-			else:
-				return
-		elif self._data['x'] == x and self._data['y'] == y:
-			self.resize(w, h)
-		elif self._data['x'] + w < CuApplication.getW() and self._data['y'] + h < CuApplication.getH():
-			self.resize(w, h)
-			self.move(x, y)
-		else:
-			# logging.debug("EXTRA:"+str({"SELF":self._data['name'], "x":self._data['x'],"y":self._data['y'],"w":self._data['w'],"h":self._data['h}']))
-			self._data['x'] = x
-			self._data['y'] = y
-			self._data['w'] = w
-			self._data['h'] = h
-			self.resize(w, h)
-			self.move(x, y)
-
 		if self._data['layout'] is not None:
 			self._data['layout'].setGeometry(self._data['x'], self._data['y'], self._data['w'], self._data['h'])
-			self._data['layout'].update()
+		self.update()
 
-	#def setMaximumSize(self, maxw: int, maxh: int): pass
-	#def setMinimumSize(self, minw: int, minh: int): pass
+	def resize(self, w, h):
+		self._data['w'] = w
+		self._data['h'] = h
+		self._data['win'].resize(self._data['w'],self._data['h'])
+		if self._data['layout'] is not None:
+			self._data['layout'].setGeometry(self._data['x'], self._data['y'], self._data['w'], self._data['h'])
+		self.update()
+
+	def setGeometry(self, x, y, w, h):
+		#logging.debug("FROM:"+str({"SELF":self._data['name'], "x":x,"y":y,"w":w,"h":h}))
+		self.resize(w, h)
+		self.move(x, y)
 
 	@staticmethod
 	def _showHandle(layout):

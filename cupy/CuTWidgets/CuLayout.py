@@ -143,14 +143,14 @@ class CuHBoxLayout(CuLayout):
 		numWidgets = self.count()
 		leftWidgets = numWidgets
 		freeWidth = w
-		newx = x
+		newx, newy = x, y
 		for item in self.children():
 			sliceSize = freeWidth//leftWidgets
 			maxw = item.maximumWidth()
 			minw = item.minimumWidth()
 			if   sliceSize > maxw: sliceSize = maxw
 			elif sliceSize < minw: sliceSize = minw
-			item.setGeometry(newx, y, sliceSize, h)
+			item.setGeometry(newx, newy, sliceSize, h)
 			newx += sliceSize
 			freeWidth -= sliceSize
 			leftWidgets -= 1
@@ -201,14 +201,14 @@ class CuVBoxLayout(CuLayout):
 		numWidgets = self.count()
 		leftWidgets = numWidgets
 		freeHeight = h
-		newy = y
+		newx, newy = x, y
 		for item in self.children():
 			sliceSize = freeHeight//leftWidgets
 			maxh = item.maximumHeight()
 			minh = item.minimumHeight()
 			if   sliceSize > maxh: sliceSize = maxh
 			elif sliceSize < minh: sliceSize = minh
-			item.setGeometry(x, newy, w, sliceSize)
+			item.setGeometry(newx, newy, w, sliceSize)
 			newy += sliceSize
 			freeHeight -= sliceSize
 			leftWidgets -= 1
