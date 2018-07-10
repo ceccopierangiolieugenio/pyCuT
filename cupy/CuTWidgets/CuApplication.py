@@ -6,7 +6,7 @@ import curses, curses.panel
 import logging
 
 from CuT.CuTCore import  CuT
-from CuT.CuTCore import CuEvent, CuMouseEvent
+from CuT.CuTCore import CuEvent, CuMouseEvent, CuWheelEvent
 from CuT.CuTHelper import CuWrapper, CuHelper
 
 class CuApplication:
@@ -68,7 +68,7 @@ class CuApplication:
 		for widget in CuApplication._updateWidget:
 			widget.paintEvent(None)
 		CuApplication._updateWidget = []
-		CuHelper.execPaint()
+		CuHelper.execPaint(CuApplication.getW(),CuApplication.getH())
 		curses.panel.update_panels()
 		CuApplication.GLBL['screen'].refresh()
 
@@ -134,8 +134,14 @@ class CuApplication:
 				idm, x, y, z, bstate = curses.getmouse()
 				btype   = CuT.NoButton
 				button = None
+				logging.debug(__name__ + "  mouse evt: " + str((idm, x, y, z, bstate)))
+				# logging.debug(__name__ + "  mouse evt: " + str(curses.BUTTON1_PRESSED))
 
-				if   bstate == curses.BUTTON1_PRESSED:
+				if bstate == curses.REPORT_MOUSE_POSITION:
+						button = CuEvent.MouseMove
+						btype = CuT.NoButton
+
+				elif bstate == curses.BUTTON1_PRESSED:
 						button = CuEvent.MouseButtonPress
 						btype = CuT.LeftButton
 				elif bstate == curses.BUTTON1_RELEASED:
@@ -165,14 +171,26 @@ class CuApplication:
 						button = CuEvent.MouseButtonPress
 						btype = CuT.MidButton
 
+				elif bstate == 0x010000: # Mouse Wheel UP
+						angleDelta = 120
+						btype = CuT.ForwardButton
+				elif bstate == 0x200000: # Mouse Wheel DOWN
+						angleDelta = -120
+						btype = CuT.ForwardButton
+
 				# if bstate == curses.BUTTON1_DOUBLE_CLICKED: event =  CuEvent.MouseButtonDblClick
 				# if bstate == curses.BUTTON1_TRIPLE_CLICKED: event =  CuEvent.MouseButtonPress
-				elif bstate == curses.REPORT_MOUSE_POSITION:
-						button = CuEvent.MouseMove
-						btype = CuT.NoButton
+
 
 				mwx, mwy = CuApplication.GLBL['mainWidget'].pos()
-				evt = CuMouseEvent(
+				if btype == CuT.ForwardButton:
+					evt = CuWheelEvent(
+						type=btype,
+						pos  = {'x':x-mwx, 'y':y-mwy},
+						globalPos = {'x':x,     'y':y},
+						angleDelta=angleDelta)
+				else:
+					evt = CuMouseEvent(
 						type=btype,
 						localPos  = {'x':x-mwx, 'y':y-mwy},
 						windowPos = {'x':x-mwx, 'y':y-mwy},

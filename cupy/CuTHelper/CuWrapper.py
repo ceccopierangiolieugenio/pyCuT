@@ -5,13 +5,15 @@ import logging
 
 from CuT.CuTCore import  CuT
 
-
 class CuWin:
 	def __init__(self, widget, x, y, w, h):
 		self._widget = widget
 		self._win = curses.newwin(h, w, y, x)
 		self._panel = curses.panel.new_panel(self._win)
 		self.resetBufPaint()
+
+	def zTop(self):
+		self._panel.top()
 
 	def resetBufPaint(self):
 		self._bufPaint = {'move':None, 'resize':None, 'string':[], 'box':False}
@@ -27,6 +29,7 @@ class CuWin:
 
 	def clear(self):
 		self._bufPaint['box']=False
+		self.resetBufPaint()
 		self._win.clear()
 
 	def resize(self, w, h):
@@ -44,14 +47,25 @@ class CuWin:
 		self._bufPaint['string'].append({'x':x, 'y':y, 'str':str, 'fg':fg, 'bg':bg})
 		CuHelper.addPaintBuffer(self)
 
-	def execPaint(self):
-		#self._win.box()
+	def execPaint(self, winw, winh):
+		# self._win.box()
+		h,w = self._win.getmaxyx()
 		if self._bufPaint['resize'] is not None:
+			# Avoid the panel outside the terminal
 			self._win.clear()
-			self._win.resize(self._bufPaint['resize']['h'], self._bufPaint['resize']['w'])
+			if self._bufPaint['resize']['w'] > winw: w = winw
+			else: w = self._bufPaint['resize']['w']
+			if self._bufPaint['resize']['h'] > winh: h = winh
+			else: h = self._bufPaint['resize']['h']
+			self._win.resize(h, w)
 
 		if self._bufPaint['move'] is not None:
-			self._panel.move(self._bufPaint['move']['y'], self._bufPaint['move']['x'])
+			# Avoid the panel outside the terminal
+			if self._bufPaint['move']['x']+w > winw: x = winw-w-1
+			else: x = self._bufPaint['move']['x']
+			if self._bufPaint['move']['y']+h > winh: y = winh-h-1
+			else: y = self._bufPaint['move']['y']
+			self._panel.move(y, x)
 
 		if self._bufPaint['box']:
 			self._win.box()
@@ -88,12 +102,13 @@ class CuWin:
 				of the window (lower right edge), the cursor goes "off screen"
 				and NCurses return an error
 			'''
-			h,w = self._win.getmaxyx()
 			strlen = len(str)
+			#ww, wh = self._widget.size()
+			if (y<0) or (y>h-1) or (x>w-1) or (x+strlen<0):
+				continue
+			if (x+strlen>w):
+				str = str[:(w-x)]
 			if y == h-1 and (x+strlen)>=w :
-				#self._win.addnstr(y, x, str[:strlen-1], strlen,c)
-				##self._win.addch(y,x+strlen-2,str[strlen-1],c)
-				#self._win.insch(y,x+strlen-1,str[strlen-1],c)
 				self._win.insstr(y, x, str, c)
 			else:
 				self._win.addstr(y, x, str, c)
@@ -119,10 +134,10 @@ class CuHelper:
 			CuHelper._paintBuffer.append(win)
 
 	@staticmethod
-	def execPaint():
+	def execPaint(winw, winh):
 		#CuApplication.GLBL['mainWidget'].paintEvent(None)
 		for win in CuHelper._paintBuffer:
-			win.execPaint()
+			win.execPaint(winw, winh)
 		CuHelper._paintBuffer = []
 
 

@@ -1,12 +1,18 @@
 #!/usr/bin/python
 
+from CuT.CuTCore import  CuT
 from CuT.CuTWidgets import CuApplication, CuMainWindow
+from CuT.CuTGui import CuPainter
 from CuT.CuTHelper import CuWrapper
 
 class MainWindow(CuMainWindow):
 	def paintEvent(self, evt):
-		CuMainWindow.paint(self)
-		self.getWin().addstr(3, 3, "MainWindow")
+		qp = CuPainter()
+		qp.begin(self)
+		qp.setPen(CuT.white)
+		qp.drawText(5, 5, "MainWindow")
+		qp.end()
+		CuMainWindow.paintEvent(self, evt)
 
 
 def main(screen):
@@ -14,7 +20,6 @@ def main(screen):
 
 	app = CuApplication(screen, sys.argv)
 	window = MainWindow()
-	window.setBorder(True)
 	window.show()
 	sys.exit(app.exec_())
 

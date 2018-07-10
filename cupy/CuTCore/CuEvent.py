@@ -218,4 +218,35 @@ class CuMouseEvent(CuEvent):
 	ref: http://doc.qt.io/qt-5/qwheelevent.html
 '''
 class CuWheelEvent(CuEvent):
-	pass
+	_x, _y = 0, 0
+	def __init__(self, type=None, pos={'x':0, 'y':0}, globalPos={'x':0, 'y':0}, angleDelta=0):
+		CuEvent.__init__(self, type=type )
+		self._localPos  = pos
+		self._globalPos = globalPos
+		self._angleDelta = angleDelta
+
+	def globalPos(self):
+		return self._globalPos['x'], self._globalPos['y']
+
+	# Returns the global x position of the mouse cursor at the time of the event.
+	def globalX(self):
+		return self._globalPos['x']
+
+	# Returns the global y position of the mouse cursor at the time of the event.
+	def globalY(self):
+		return self._globalPos['y']
+
+	# Returns the position of the mouse cursor, relative to the widget that received the event.
+	def pos(self):
+		return self.x(), self.y()
+
+	# Returns the x position of the mouse cursor, relative to the widget that received the event.
+	def x(self):
+		return self._localPos['x']
+
+	# Returns the y position of the mouse cursor, relative to the widget that received the event.
+	def y(self):
+		return self._localPos['y']
+
+	def angleDelta(self):
+		return self._angleDelta

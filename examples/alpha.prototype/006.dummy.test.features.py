@@ -1,26 +1,31 @@
 #!/usr/bin/python
 
 import sys
+import logging
 
 from CuT import CuTCore, CuTWidgets
 from CuT.CuTCore import  CuT, CuEvent
 from CuT.CuTGui import CuPainter
 from CuT.CuTHelper import CuWrapper
 
-#class CuTestInput(CuTWidgets.CuFrame):
 class CuTestInput(CuTWidgets.CuWidget):
 	_id, _ix, _iy, _iz, _bstate = 0, 0, 0, 0, 0
 	_gx, _gy, _sx, _sy, _wx, _wy = 0, 0, 0, 0, 0, 0
+	_inside = False
+	_wheelAngle  = 0
 
 	def __init__(self, *args, **kwargs):
-		#CuTWidgets.CuFrame.__init__(self, *args, **kwargs)
 		CuTWidgets.CuWidget.__init__(self, *args, **kwargs)
 
 	def paintEvent(self, event):
+		# logging.debug("Paint - evt:"+str(event)+" Name:"+self.accessibleName())
 		qp = CuPainter()
 		qp.begin(self)
 		qp.setPen(CuT.white)
-		qp.drawText(3, 3, "CuTestInput... [" + self.accessibleName() + "]")
+		if self.underMouse():
+			qp.drawText(3, 3, "CuTestInput... [" + self.accessibleName() + "] [X]")
+		else:
+			qp.drawText(3, 3, "CuTestInput... [" + self.accessibleName() + "] [ ]")
 		qp.setPen(CuT.yellow)
 		qp.drawText(3, 4, "     x: "  + str(self._ix) + "   ")
 		qp.drawText(3, 5, "     y: "  + str(self._iy) + "   ")
@@ -32,12 +37,32 @@ class CuTestInput(CuTWidgets.CuWidget):
 		qp.drawText(3,10, "     wx: " + str(self._wx) + "   ")
 		qp.drawText(3,11, "     wy: " + str(self._wy) + "   ")
 		qp.setPen(CuT.red)
-		qp.drawText(3, 12, "bstate: " + str(self._bstate) + "        ")
+		if self._wheelAngle == 0:
+			qp.drawText(3, 12, "bstate: " + str(self._bstate) + "                ")
+		elif self._wheelAngle > 0:
+			qp.drawText(3, 12, "bstate: Wheel - UP        ")
+			self._wheelAngle = 0
+		elif self._wheelAngle < 0:
+			qp.drawText(3, 12, "bstate: Wheel - DOWN        ")
+			self._wheelAngle = 0
 		qp.setPen(CuT.lightGray)
 		qp.drawText(3, 15, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.setPen(CuT.darkGreen)
+		qp.drawText(0, 0,               "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.drawText(0, self.height()-1, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 		qp.end()
 
+#	def enterEvent(self, evt): pass
+	def leaveEvent(self, evt):
+		self.update()
+
+	def wheelEvent(self, evt):
+		logging.debug("evt:"+str(evt.type())+" Name:"+self.accessibleName())
+		self._wheelAngle = evt.angleDelta()
+		self.update()
+
 	def event(self, evt):
+		#logging.debug("evt:"+str(evt.type())+" Name:"+self.accessibleName())
 		if isinstance(evt, CuTCore.CuMouseEvent):
 			self._ix, self._iy = evt.pos()
 			self._gx, self._gy = evt.globalPos()
@@ -59,13 +84,14 @@ class CuMovableTestInput(CuTestInput):
 		qp.setPen(CuT.blue)
 		qp.drawText(3, 2, "[MOVABLE] " + str(self._state) + "    ")
 		qp.drawText(3, 19, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-		# qp.drawText(3, 19, "abc")
 		qp.end()
 
 	def mousePressEvent(self, evt):
-		self._state = "Pressed"
-		self._px, self._py = self.pos()
-		self._mx, self._my = evt.screenPos()
+		logging.debug("evt:"+str(evt.type())+" Name:"+self.accessibleName())
+		if evt.type() == CuT.LeftButton:
+			self._state = "Pressed"
+			self._px, self._py = self.pos()
+			self._mx, self._my = evt.screenPos()
 
 	def mouseReleaseEvent(self, evt):
 		self._state = None
@@ -77,14 +103,9 @@ class CuMovableTestInput(CuTestInput):
 				if self._state == "Pressed":
 					newx = self._px+x-self._mx
 					newy = self._py+y-self._my
-					if newx < 0: newx=0
-					if newy < 0: newy=0
-					if newx+self.width()  > CuTWidgets.CuApplication.getW() : newx=CuTWidgets.CuApplication.getW()-self.width()
-					if newy+self.height() > CuTWidgets.CuApplication.getH() : newy=CuTWidgets.CuApplication.getH()-self.height()
 					self.move(newx, newy);
 			self.update()
-			# return True
-			return CuTestInput.event(self, evt)
+		return CuTestInput.event(self, evt)
 
 def addFrame(widget):
 	f = CuTWidgets.CuFrame(parent=widget.parentWidget())
@@ -99,23 +120,20 @@ def main(screen):
 	app = CuTWidgets.CuApplication(screen, sys.argv)
 
 	mw = CuTWidgets.CuMainWindow(name='MW')
-	mw.setMaximumSize(180,50)
+	mw.setMaximumSize(180,60)
 	mw.setMinimumSize(60,30)
 
 	layout = CuTWidgets.CuHBoxLayout()
 
 	tw1 = addFrame(CuTestInput(parent=mw, name='tw1'))
-	#tw1 = CuTestInput(parent=mw, name='tw1')
 	layout.addWidget(tw1)
-
 
 	vlayout2 = CuTWidgets.CuVBoxLayout()
 
-	tw2 = CuTestInput(parent=mw, name='tw2')
+	tw2 = addFrame(addFrame(CuTestInput(parent=mw, name='tw2')))
 	vlayout2.addWidget(tw2)
-	#layout.addWidget(tw2)
 
-	tw2_1 = addFrame(CuTestInput(parent=mw, name='tw2.1'))
+	tw2_1 = addFrame(CuMovableTestInput(parent=mw, name='tw2.1'))
 	vlayout2.addWidget(tw2_1)
 
 	tw2_2 = CuTestInput(parent=mw, name='tw2.2')
@@ -133,7 +151,7 @@ def main(screen):
 	tw3 = CuTestInput(parent=f1, name='tw3')
 	vlayout.addWidget(tw3)
 
-	mtw1 = addFrame(CuMovableTestInput(parent=f1, name='mtw1'))
+	mtw1 = addFrame(addFrame(CuMovableTestInput(parent=f1, name='mtw1')))
 	vlayout.addWidget(mtw1)
 
 	mw.setLayout(layout)

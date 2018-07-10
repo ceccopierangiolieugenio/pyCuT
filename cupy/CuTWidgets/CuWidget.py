@@ -41,6 +41,7 @@ class CuWidget:
 		self._data['childs'] = []
 		self._data['win'] = CuWrapper.newWin(self, self._data['x'], self._data['y'], self._data['w'], self._data['h'])
 		self._data['layout'] = None
+		self._data['mouse'] = {'underMouse':False}
 		self.hide()
 
 	def accessibleName(self):
@@ -52,14 +53,29 @@ class CuWidget:
 	def getWin(self):
 		return self._data['win']
 
-	def paintEvent(self, event):
-		if self._data['layout'] is not None:
-			self._data['layout'].paintEvent(event)
+	def paintEvent(self, event): pass
+
+	def underMouse(self):
+		return self._data['mouse']['underMouse']
 
 	def mouseDoubleClickEvent(self, evt): pass
 	def mouseMoveEvent(self, evt): pass
 	def mousePressEvent(self, evt): pass
 	def mouseReleaseEvent(self, evt): pass
+	def wheelEvent(self, evt): pass
+	def enterEvent(self, evt): pass
+	def leaveEvent(self, evt): pass
+
+	@staticmethod
+	def _broadcastLeaveEvent(evt, layout):
+		for i in range(layout.count()):
+			item = layout.itemAt(i)
+			if isinstance(item, CuWidgetItem) and not item.isEmpty():
+				if item.widget()._data['mouse']['underMouse']:
+					item.widget()._data['mouse']['underMouse'] = False
+					item.widget().leaveEvent(evt)
+			elif isinstance(item, CuLayout):
+				CuWidget._broadcastLeaveEvent(evt, item)
 
 	@staticmethod
 	def _eventLayoutHandle(evt, layout):
@@ -67,7 +83,10 @@ class CuWidget:
 			item = layout.itemAt(i)
 			if isinstance(item, CuWidgetItem) and not item.isEmpty():
 				widget = item.widget()
+				wevt = None
+				mouseEvent = False
 				if isinstance(evt, CuMouseEvent):
+					mouseEvent = True
 					wx, wy = CuHelper.absPos(widget)
 					ww, wh = widget.size()
 					ewx, ewy = evt.windowPos()
@@ -82,8 +101,34 @@ class CuWidget:
 							windowPos = {'x':ewx, 'y':ewy},
 							screenPos = {'x':esx, 'y':esy},
 							button=evt.button())
-						if widget.event(wevt): return True
+				if isinstance(evt, CuWheelEvent):
+					mouseEvent = True
+					wx, wy = CuHelper.absPos(widget)
+					ww, wh = widget.size()
+					egx, egy = evt.globalPos()
+					lx, ly = egx-wx, egy-wy
+					# Skip the mouse event if outside this widget
+					if lx >= 0 and ly >= 0 and lx < ww and ly < wh:
+						wevt = CuWheelEvent(
+							type=evt.type(),
+							pos  = {'x':lx,  'y':ly},
+							globalPos = {'x':egx,     'y':egy},
+							angleDelta=evt.angleDelta())
+				if mouseEvent:
+					if wevt is not None:
+						if not widget._data['mouse']['underMouse']:
+							widget._data['mouse']['underMouse'] = True
+							widget.enterEvent(wevt)
+						if widget.event(wevt):
+							return True
+					else:
+						if widget._data['mouse']['underMouse']:
+							widget._data['mouse']['underMouse'] = False
+							widget.leaveEvent(evt)
+						if widget._data['layout'] is not None:
+							CuWidget._broadcastLeaveEvent(evt, widget._data['layout'])
 					continue
+
 				if widget.event(evt):
 					return True
 			elif isinstance(item, CuLayout):
@@ -93,14 +138,16 @@ class CuWidget:
 
 	def event(self, evt):
 		# handle own events
-		if evt.type() == CuT.LeftButton or evt.type() == CuT.RightButton or evt.type() == CuT.MidButton:
+		if evt.type() == CuT.NoButton:
+			if evt.button() == CuEvent.MouseMove:
+				self.mouseMoveEvent(evt)
+		elif evt.type() == CuT.LeftButton or evt.type() == CuT.RightButton or evt.type() == CuT.MidButton:
 			if   evt.button() == CuEvent.MouseButtonRelease:
 				self.mouseReleaseEvent(evt)
 			elif evt.button() == CuEvent.MouseButtonPress:
 				self.mousePressEvent(evt)
-		if evt.type() == CuT.NoButton:
-			if evt.button() == CuEvent.MouseMove:
-				self.mouseMoveEvent(evt)
+		elif evt.type() == CuT.ForwardButton:
+			self.wheelEvent(evt)
 
 		# Trigger this event to the childs
 		if self._data['layout'] is not None:

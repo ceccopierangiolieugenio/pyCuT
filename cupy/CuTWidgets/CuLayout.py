@@ -68,15 +68,9 @@ class CuLayout(CuLayoutItem):
 		for i in self.children():
 			if isinstance(i, CuWidgetItem) and not i.isEmpty():
 				i.widget().update()
+				i.getWin().top()
 			elif isinstance(i, CuLayout):
 				i.update()
-
-	def paintEvent(self, event):
-		for i in self.children():
-			if isinstance(i, CuWidgetItem) and not i.isEmpty():
-				i.widget().paintEvent(event)
-			elif isinstance(i, CuLayout):
-					i.paintEvent(event)
 
 class CuWidgetItem(CuLayoutItem):
 	def __init__(self, widget):
@@ -156,6 +150,7 @@ class CuHBoxLayout(CuLayout):
 			leftWidgets -= 1
 			if isinstance(item, CuWidgetItem) and not item.isEmpty():
 				item.widget().update()
+				item.widget().getWin().zTop()
 			elif isinstance(item, CuLayout):
 				item.update()
 
@@ -214,5 +209,6 @@ class CuVBoxLayout(CuLayout):
 			leftWidgets -= 1
 			if isinstance(item, CuWidgetItem) and not item.isEmpty():
 				item.widget().update()
+				item.widget().getWin().zTop()
 			elif isinstance(item, CuLayout):
 				item.update()

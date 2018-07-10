@@ -62,7 +62,6 @@ class CuFrame(CuWidget):
 	def paintEvent(self, event):
 		if self._lineWidth > 0:
 			self._data['win'].box()
-		CuWidget.paintEvent(self, event)
 
 class CuMainWindow(CuFrame):
 	def __init__(self, *args, **kwargs):
