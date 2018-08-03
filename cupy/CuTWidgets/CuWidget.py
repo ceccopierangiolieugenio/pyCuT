@@ -26,18 +26,16 @@ class CuWidget:
 			}
 		self._data = {}
 
-		if 'parent' in kwargs: self._data['parent'] = kwargs['parent']
-		else : self._data['parent'] = None; CuApplication.setMainWidget(self)
-		if 'name' in kwargs: self._data['name'] = kwargs['name']
-		else : self._data['name'] = ''
-		if 'x' in kwargs: self._data['x'] = kwargs['x']
-		else : self._data['x'] = 0
-		if 'y' in kwargs: self._data['y'] = kwargs['y']
-		else : self._data['y'] = 0
-		if 'w' in kwargs: self._data['w'] = kwargs['w']
-		else : self._data['w'] = CuApplication.getW()
-		if 'h' in kwargs: self._data['h'] = kwargs['h']
-		else : self._data['h'] = CuApplication.getH()
+		self._data['parent'] = kwargs.get('parent', None )
+		self._data['name'] = kwargs.get('name', '')
+		self._data['x'] = kwargs.get('x', 0)
+		self._data['y'] = kwargs.get('y', 0)
+		self._data['w'] = kwargs.get('w', CuApplication.getW())
+		self._data['h'] = kwargs.get('h', CuApplication.getH())
+
+		if self._data['parent'] is None:
+			CuApplication.setMainWidget(self)
+
 		self._data['childs'] = []
 		self._data['win'] = CuWrapper.newWin(self, self._data['x'], self._data['y'], self._data['w'], self._data['h'])
 		self._data['layout'] = None
