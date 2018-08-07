@@ -15,6 +15,12 @@
 # Misc
   [ ] Get rid of ncurses
 
+# Signal/Slots
+  [ ] Add error in disconnect if slot not found
+  [ ] Check emit types:
+      # i.e.
+      # TypeError: test.sig_3[int, str, str].emit(): argument 3 has unexpected type 'int'
+
 # Api
 #  CuWidget
   [ ] Clean move, resize (apply also to layout)

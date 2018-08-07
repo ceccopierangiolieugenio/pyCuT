@@ -125,16 +125,19 @@ class CuApplication:
 				event = curses.ERR
 				continue
 
-			if event == curses.ERR: break
-			if event == ord("q"): break
+			logging.debug(__name__ + "  event: " + hex(event))
 
-			evt = None
+			if event == -1: continue
+
+			if event == curses.ERR: break
 
 			if event == curses.KEY_MOUSE:
+				mouse_evt = None
+				# Mouse event
 				idm, x, y, z, bstate = curses.getmouse()
 				btype   = CuT.NoButton
 				button = None
-				logging.debug(__name__ + "  mouse evt: " + str((idm, x, y, z, bstate)))
+				# logging.debug(__name__ + "  mouse evt: " + str((idm, x, y, z, bstate)))
 				# logging.debug(__name__ + "  mouse evt: " + str(curses.BUTTON1_PRESSED))
 
 				if bstate == curses.REPORT_MOUSE_POSITION:
@@ -181,25 +184,32 @@ class CuApplication:
 				# if bstate == curses.BUTTON1_DOUBLE_CLICKED: event =  CuEvent.MouseButtonDblClick
 				# if bstate == curses.BUTTON1_TRIPLE_CLICKED: event =  CuEvent.MouseButtonPress
 
-
 				mwx, mwy = CuApplication.GLBL['mainWidget'].pos()
 				if btype == CuT.ForwardButton:
-					evt = CuWheelEvent(
+					mouse_evt = CuWheelEvent(
 						type=btype,
 						pos  = {'x':x-mwx, 'y':y-mwy},
 						globalPos = {'x':x,     'y':y},
 						angleDelta=angleDelta)
 				else:
-					evt = CuMouseEvent(
+					mouse_evt = CuMouseEvent(
 						type=btype,
 						localPos  = {'x':x-mwx, 'y':y-mwy},
 						windowPos = {'x':x-mwx, 'y':y-mwy},
 						screenPos = {'x':x,     'y':y},
 						button=button)
 
-			if event == curses.KEY_RESIZE:
+				CuApplication.GLBL['mainWidget'].event(mouse_evt)
+
+			elif event == curses.KEY_RESIZE:
 				CuApplication.refreshMain()
 
-			if evt is not None:
-				CuApplication.GLBL['mainWidget'].event(evt)
+			else:
+				# key pressed
+				logging.debug(__name__ + "  Pressed key " + str(event)) #, "("+keyname(event)+")")
+				if event == ord("q"): break
+
+
+
+
 		return 0

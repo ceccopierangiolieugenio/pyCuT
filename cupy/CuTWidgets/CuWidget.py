@@ -13,6 +13,7 @@ from .CuApplication import *
 
 
 class CuWidget:
+	__slots__ = ('_data', '_extra')
 	def __init__(self, *args, **kwargs):
 		if not CuApplication.is_initialized():
 			print(self.__class__.__name__ + ": Must construct a CuApplication before a CuWidget")
