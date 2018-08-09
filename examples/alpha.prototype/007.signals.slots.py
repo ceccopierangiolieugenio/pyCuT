@@ -20,6 +20,44 @@ class CuTestInput(CuTWidgets.CuWidget):
 	def __init__(self, *args, **kwargs):
 		CuTWidgets.CuWidget.__init__(self, *args, **kwargs)
 
+		self.test_signal_in_001 = pycutSignal(int)
+		self.test_signal_in_002 = pycutSignal(int, int)
+		# self.test_signal = pycutSignal(int, str)
+
+	test_signal = pycutSignal(int, str)
+	test_signal_out_001 = pycutSignal(int, int, int)
+	test_signal_out_002 = pycutSignal(int, int, int, int)
+
+	@pycutSlot(int, str)
+	def test_slot(self, x, y):
+		logging.debug("test_slot triggered - Name:" + self.accessibleName() + " x:" + str(x) + " y:" + y)
+		self.triggered_slot += 1
+		self.update()
+
+	def mousePressEvent(self, evt):
+		logging.debug("Emitting Signal - Name:" + self.accessibleName())
+		self.test_signal.emit(123, 'Eugenio')
+
+#	def enterEvent(self, evt): pass
+	def leaveEvent(self, evt):
+		self.update()
+
+	def wheelEvent(self, evt):
+		logging.debug("evt:"+str(evt.type())+" Name:"+self.accessibleName())
+		self._wheelAngle = evt.angleDelta()
+		self.update()
+
+	def event(self, evt):
+		#logging.debug("evt:"+str(evt.type())+" Name:"+self.accessibleName())
+		if isinstance(evt, CuTCore.CuMouseEvent):
+			self._ix, self._iy = evt.pos()
+			self._gx, self._gy = evt.globalPos()
+			self._sx, self._sy = evt.screenPos()
+			self._wx, self._wy = evt.screenPos()
+			self._bstate = evt.button()
+		self.update()
+		return CuTWidgets.CuWidget.event(self, evt)
+
 	def paintEvent(self, event):
 		# logging.debug("Paint - evt:"+str(event)+" Name:"+self.accessibleName())
 		qp = CuPainter()
@@ -57,38 +95,6 @@ class CuTestInput(CuTWidgets.CuWidget):
 		qp.drawText(0, self.height()-1, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 		qp.end()
 
-	test_signal = pycutSignal(int, str)
-
-	@pycutSlot(int, str)
-	def test_slot(self, x, y):
-		logging.debug("test_slot triggered - Name:" + self.accessibleName() + " x:" + str(x) + " y:" + y)
-		self.triggered_slot += 1
-		self.update()
-
-	def mousePressEvent(self, evt):
-		logging.debug("Emitting Signal - Name:" + self.accessibleName())
-		self.test_signal.emit(123, 123)
-
-#	def enterEvent(self, evt): pass
-	def leaveEvent(self, evt):
-		self.update()
-
-	def wheelEvent(self, evt):
-		logging.debug("evt:"+str(evt.type())+" Name:"+self.accessibleName())
-		self._wheelAngle = evt.angleDelta()
-		self.update()
-
-	def event(self, evt):
-		#logging.debug("evt:"+str(evt.type())+" Name:"+self.accessibleName())
-		if isinstance(evt, CuTCore.CuMouseEvent):
-			self._ix, self._iy = evt.pos()
-			self._gx, self._gy = evt.globalPos()
-			self._sx, self._sy = evt.screenPos()
-			self._wx, self._wy = evt.screenPos()
-			self._bstate = evt.button()
-		self.update()
-		return CuTWidgets.CuWidget.event(self, evt)
-
 def addFrame(widget):
 	f = CuTWidgets.CuFrame(parent=widget.parentWidget())
 	f.resize(100,100)
@@ -125,6 +131,18 @@ def main(screen):
 	ti2.test_signal.connect(ti1.test_slot)
 	ti2.test_signal.connect(tw2_2.test_slot)
 	tw2_2.test_signal.connect(ti1.test_slot)
+
+	logging.debug("signal ti1.test_signal:        " + str(ti1.test_signal))
+	logging.debug("signal ti1.test_signal_out_001:" + str(ti1.test_signal_out_001))
+	logging.debug("signal ti1.test_signal_out_002:" + str(ti1.test_signal_out_002))
+	logging.debug("signal ti1.test_signal_in_001: " + str(ti1.test_signal_in_001))
+	logging.debug("signal ti1.test_signal_in_002: " + str(ti1.test_signal_in_002))
+
+	logging.debug("signal ti1.test_signal:        " + str(ti1.test_signal))
+	logging.debug("signal ti1.test_signal_out_001:" + str(ti1.test_signal_out_001))
+	logging.debug("signal ti1.test_signal_out_002:" + str(ti1.test_signal_out_002))
+	logging.debug("signal ti1.test_signal_in_001: " + str(ti1.test_signal_in_001))
+	logging.debug("signal ti1.test_signal_in_002: " + str(ti1.test_signal_in_002))
 
 	layout.addItem(vlayout2)
 

@@ -23,7 +23,8 @@ class CuApplication:
 	@staticmethod
 	def __CuInit__(screen):
 		logging.basicConfig(filename='session.log',level=logging.DEBUG)
-		curses.curs_set(0)
+		curses.curs_set(False)
+		# curses.curs_set(1)
 		screen.keypad(1)
 		curses.mousemask(curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION)
 		curses.mouseinterval(0)
@@ -125,7 +126,7 @@ class CuApplication:
 				event = curses.ERR
 				continue
 
-			logging.debug(__name__ + "  event: " + hex(event))
+			# logging.debug(__name__ + "  event: " + hex(event))
 
 			if event == -1: continue
 

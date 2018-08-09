@@ -5,8 +5,8 @@
 import logging
 import os
 from CuT.CuTHelper import CuWrapper, CuHelper
+from CuT.CuTCore import pycutSlot, pycutSignal
 from CuT.CuTCore import CuEvent, CuMouseEvent
-
 from .CuLayout import *
 from .CuApplication import *
 
@@ -281,3 +281,43 @@ class CuWidget:
 		CuApplication.addUpdateWidget(self)
 		if self._data['layout'] is not None:
 			self._data['layout'].update()
+
+'''
+	Focus Logic
+	ref: http://doc.qt.io/qt-5/qwidget.html
+
+	properties:
+		focus : const bool
+		focusPolicy : Qt::FocusPolicy
+
+	Public Functions:
+		void             clearFocus()
+
+		Qt::FocusPolicy  focusPolicy() const
+		QWidget *        focusProxy() const
+		QWidget *        focusWidget() const
+
+		bool             hasEditFocus() const
+		bool             hasFocus() const
+
+		QWidget *        nextInFocusChain() const
+		QWidget *        previousInFocusChain() const
+
+		void             setEditFocus(bool enable)
+		void             setFocus(Qt::FocusReason reason)
+		void             setFocusPolicy(Qt::FocusPolicy policy)
+		void             setFocusProxy(QWidget *w)
+
+	Public Slots:
+		void             setFocus()
+
+	Protected Functions:
+		virtual void     focusInEvent(QFocusEvent *event)
+		bool             focusNextChild()
+		virtual bool     focusNextPrevChild(bool next)
+		virtual void     focusOutEvent(QFocusEvent *event)
+		bool             focusPreviousChild()
+
+	Protected Slots:
+		void             updateMicroFocus()
+'''

@@ -1,5 +1,7 @@
 
 import logging
+import inspect
+import re
 
 '''
 ref: http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html
@@ -13,7 +15,43 @@ def pycutSlot(*args, **kwargs):
 		return func
 	return pycutSlot_d
 
-class pycutSignal():
+# logging.basicConfig(filename='session.log',level=logging.DEBUG)
+
+___signal_class_re = re.compile(r"^\s*class\s*[^()\s]*\s*\([^)]*\)\s*:")
+___signal_class_id = 0
+def pycutSignal(*args, **kwargs):
+	'''
+		This amount of rubbish is required to mimic the "pyqtSignal()" behaviour
+		it can be used as Class or Object member and in both cases it refer
+		to the object when used
+	'''
+	curframe = inspect.currentframe()
+	calframe = inspect.getouterframes(curframe,1)
+	if len(calframe) > 2:
+		if ___signal_class_re.match(calframe[2][4][0]):
+			# It's a Class Member
+			# logging.debug("Signal As Class Member: " + calframe[1][4][0])
+			global ___signal_class_id
+			___signal_class_id += 1
+			# Create a unique name to identify this Signal in the object
+			idx = '___cusignal_eu___'+str(___signal_class_id)
+			def tmp_prop(self):
+				if hasattr(self, idx):
+					tmp_ret = getattr(self, idx)
+				else:
+					tmp_ret = pycutSignal_obj(*args, **kwargs)
+					setattr(self, idx, tmp_ret)
+				return tmp_ret
+			ret = property(tmp_prop)
+		else:
+			# It's NOT a Class Member
+			# logging.debug("Signal As Object Member: " + calframe[1][4][0])
+			ret = pycutSignal_obj(*args, **kwargs)
+	del calframe
+	del curframe
+	return ret
+
+class pycutSignal_obj():
 	'''
 		ref: http://pyqt.sourceforge.net/Docs/PyQt5/signals_slots.html#PyQt5.QtCore.pyqtSignal
 

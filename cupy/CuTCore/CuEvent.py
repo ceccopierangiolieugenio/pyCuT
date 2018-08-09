@@ -11,6 +11,7 @@ class CuEvent:
 		enum QEvent::Type
 		http://doc.qt.io/qt-5/qevent.html#Type-enum
 	'''
+	class Type(int): pass
 	# None = 0     # Not an event.
 	ActionAdded = 114     # A new action has been added (QActionEvent).
 	ActionChanged = 113     # An action has been changed (QActionEvent).

@@ -1,29 +1,28 @@
 
 class CuT:
-	class GlobalColor(int):
-		pass
-
-	color0 = 1 # type: 'Qt.GlobalColor'
-	color1 = 2
-	black = 3
-	white = 4
-	darkGray = 5
-	gray = 6
-	lightGray = 7
-	red = 8
-	green = 9
-	blue = 10
-	cyan = 11
-	magenta = 12
-	yellow = 13
-	darkRed = 14
-	darkGreen = 15
-	darkBlue = 16
-	darkCyan = 17
+	class GlobalColor(int): pass
+	color0      = 1 # type: 'Qt.GlobalColor'
+	color1      = 2
+	black       = 3
+	white       = 4
+	darkGray    = 5
+	gray        = 6
+	lightGray   = 7
+	red         = 8
+	green       = 9
+	blue        = 10
+	cyan        = 11
+	magenta     = 12
+	yellow      = 13
+	darkRed     = 14
+	darkGreen   = 15
+	darkBlue    = 16
+	darkCyan    = 17
 	darkMagenta = 18
-	darkYellow = 19
+	darkYellow  = 19
 	transparent = 20
 
+	class MouseButton(int): pass
 	NoButton      = 0x00000000 # The button state does not refer to any button (see QMouseEvent::button()).
 	AllButtons    = 0x07ffffff # This value corresponds to a mask of all possible mouse buttons. Use to set the 'acceptedButtons' property of a MouseArea to accept ALL mouse buttons.
 	LeftButton    = 0x00000001 # The left button is pressed, or an event refers to the left button. (The left button may be the right button on left-handed mice.)
@@ -60,6 +59,22 @@ class CuT:
 	ExtraButton23 = 0x02000000 # The 26th non-wheel Mouse Button.
 	ExtraButton24 = 0x04000000 # The 27th non-wheel Mouse Button.
 
+	class FocusPolicy(int): pass
+	TabFocus =    0x1 # the widget accepts focus by tabbing.
+	ClickFocus =  0x2 # the widget accepts focus by clicking.
+	StrongFocus = TabFocus | ClickFocus | 0x8 # the widget accepts focus by both tabbing and clicking. On macOS this will also be indicate that the widget accepts tab focus when in 'Text/List focus mode'.
+	WheelFocus =  StrongFocus | 0x4 # like Qt::StrongFocus plus the widget accepts focus by using the mouse wheel.
+	NoFocus =     0 # the widget does not accept focus.
+
+	class FocusReason(int): pass
+	MouseFocusReason        = 0 # A mouse action occurred.
+	TabFocusReason          = 1 # The Tab key was pressed.
+	BacktabFocusReason      = 2 # A Backtab occurred. The input for this may include the Shift or Control keys; e.g. Shift+Tab.
+	ActiveWindowFocusReason = 3 # The window system made this window either active or inactive.
+	PopupFocusReason        = 4 # The application opened/closed a pop-up that grabbed/released the keyboard focus.
+	ShortcutFocusReason     = 5 # The user typed a label's buddy shortcut
+	MenuBarFocusReason      = 6 # The menu bar took focus.
+	OtherFocusReason        = 7 # Another reason, usually application-specific.
 
 class CuPoint:
 	def __init__(self, x=0, y=0):
