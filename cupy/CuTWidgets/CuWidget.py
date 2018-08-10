@@ -15,7 +15,7 @@ from .CuApplication import *
 class CuWidget:
 	__slots__ = ('_data', '_extra')
 	def __init__(self, *args, **kwargs):
-		if not CuApplication.is_initialized():
+		if not CuHelper.app_initialized():
 			print(self.__class__.__name__ + ": Must construct a CuApplication before a CuWidget")
 			os.abort()
 
@@ -31,11 +31,11 @@ class CuWidget:
 		self._data['name'] = kwargs.get('name', '')
 		self._data['x'] = kwargs.get('x', 0)
 		self._data['y'] = kwargs.get('y', 0)
-		self._data['w'] = kwargs.get('w', CuApplication.getW())
-		self._data['h'] = kwargs.get('h', CuApplication.getH())
+		self._data['w'] = kwargs.get('w', CuHelper.getW())
+		self._data['h'] = kwargs.get('h', CuHelper.getH())
 
 		if self._data['parent'] is None:
-			CuApplication.setMainWidget(self)
+			CuHelper.setMainWidget(self)
 
 		self._data['childs'] = []
 		self._data['win'] = CuWrapper.newWin(self, self._data['x'], self._data['y'], self._data['w'], self._data['h'])
@@ -278,46 +278,50 @@ class CuWidget:
 		return self._data['visible']
 
 	def update(self):
-		CuApplication.addUpdateWidget(self)
+		CuHelper.addUpdateWidget(self)
 		if self._data['layout'] is not None:
 			self._data['layout'].update()
 
-'''
-	Focus Logic
-	ref: http://doc.qt.io/qt-5/qwidget.html
+	'''
+		Focus Logic
+		ref: http://doc.qt.io/qt-5/qwidget.html
 
-	properties:
-		focus : const bool
-		focusPolicy : Qt::FocusPolicy
+		properties:
+			focus : const bool
+			focusPolicy : Qt::FocusPolicy
 
-	Public Functions:
-		void             clearFocus()
+		Public Functions:
+			void             clearFocus()
 
-		Qt::FocusPolicy  focusPolicy() const
-		QWidget *        focusProxy() const
-		QWidget *        focusWidget() const
+			Qt::FocusPolicy  focusPolicy() const
+			QWidget *        focusProxy() const
+			QWidget *        focusWidget() const
 
-		bool             hasEditFocus() const
-		bool             hasFocus() const
+			bool             hasEditFocus() const
+			bool             hasFocus() const
 
-		QWidget *        nextInFocusChain() const
-		QWidget *        previousInFocusChain() const
+			QWidget *        nextInFocusChain() const
+			QWidget *        previousInFocusChain() const
 
-		void             setEditFocus(bool enable)
-		void             setFocus(Qt::FocusReason reason)
-		void             setFocusPolicy(Qt::FocusPolicy policy)
-		void             setFocusProxy(QWidget *w)
+			void             setEditFocus(bool enable)
+			void             setFocus(Qt::FocusReason reason)
+			void             setFocusPolicy(Qt::FocusPolicy policy)
+			void             setFocusProxy(QWidget *w)
 
-	Public Slots:
-		void             setFocus()
+		Public Slots:
+			void             setFocus()
 
-	Protected Functions:
-		virtual void     focusInEvent(QFocusEvent *event)
-		bool             focusNextChild()
-		virtual bool     focusNextPrevChild(bool next)
-		virtual void     focusOutEvent(QFocusEvent *event)
-		bool             focusPreviousChild()
+		Protected Functions:
+			virtual void     focusInEvent(QFocusEvent *event)
+			bool             focusNextChild()
+			virtual bool     focusNextPrevChild(bool next)
+			virtual void     focusOutEvent(QFocusEvent *event)
+			bool             focusPreviousChild()
 
-	Protected Slots:
-		void             updateMicroFocus()
-'''
+		Protected Slots:
+			void             updateMicroFocus()
+	'''
+
+	@pycutSlot()
+	def setFocus(self):
+		pass

@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 
 import curses, curses.panel
 import logging
@@ -6,6 +6,7 @@ import logging
 from CuT.CuTCore import  CuT
 
 class CuWin:
+	__slots__ = ('_widget', '_win', '_panel', '_bufPaint')
 	def __init__(self, widget, x, y, w, h):
 		self._widget = widget
 		self._win = curses.newwin(h, w, y, x)
@@ -68,7 +69,21 @@ class CuWin:
 			self._panel.move(y, x)
 
 		if self._bufPaint['box']:
-			self._win.box()
+			# # self._win.box()
+			# Rectangle drawing routine from:
+			# /usr/lib/python2.7/curses/textpad.py
+			uly, ulx = 0, 0
+			lry, lrx = h-1, w-1
+			self._win.vline(uly+1, ulx, curses.ACS_VLINE, lry - uly - 1)
+			self._win.hline(uly, ulx+1, curses.ACS_HLINE, lrx - ulx - 1)
+			self._win.hline(lry, ulx+1, curses.ACS_HLINE, lrx - ulx - 1)
+			self._win.vline(uly+1, lrx, curses.ACS_VLINE, lry - uly - 1)
+			self._win.addch(uly, ulx, curses.ACS_ULCORNER)
+			self._win.addch(uly, lrx, curses.ACS_URCORNER)
+			self._win.insch(lry, lrx, curses.ACS_LRCORNER)
+			self._win.addch(lry, ulx, curses.ACS_LLCORNER)
+			# logging.debug("boxch:" + u'わ'+ hex(curses.ACS_LLCORNER) )
+
 
 		for ds in self._bufPaint['string']:
 			x = ds['x']
@@ -116,6 +131,32 @@ class CuWin:
 
 
 class CuHelper:
+	GLBL = {
+		'maxY' : 0,
+		'maxX' : 0,
+		'screen' : None,
+		'mainWidget' : None,
+		'focusWidget' : None
+	}
+
+	@staticmethod
+	def setMainWidget(widget):
+		CuHelper.GLBL['mainWidget'] = widget
+
+	@staticmethod
+	def getW():
+		return CuHelper.GLBL['maxX']
+
+	@staticmethod
+	def getH():
+		return CuHelper.GLBL['maxY']
+
+	_updateWidget = []
+	@staticmethod
+	def addUpdateWidget(widget):
+		if widget not in CuHelper._updateWidget:
+			CuHelper._updateWidget.append(widget)
+
 	@staticmethod
 	def absPos(widget):
 		px, py = CuHelper.absParentPos(widget)
@@ -135,10 +176,73 @@ class CuHelper:
 
 	@staticmethod
 	def execPaint(winw, winh):
-		#CuApplication.GLBL['mainWidget'].paintEvent(None)
+		#CuHelper.GLBL['mainWidget'].paintEvent(None)
 		for win in CuHelper._paintBuffer:
 			win.execPaint(winw, winh)
 		CuHelper._paintBuffer = []
+
+	@staticmethod
+	def __CuInit__(screen):
+		logging.basicConfig(filename='session.log',level=logging.DEBUG)
+		curses.curs_set(False)
+		# curses.curs_set(1)
+		screen.keypad(1)
+		curses.mousemask(curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION)
+		curses.mouseinterval(0)
+		CuHelper.GLBL['screen'] = screen
+		CuHelper.GLBL['maxY'], CuHelper.GLBL['maxX'] = screen.getmaxyx()
+		logging.debug("SCREEN: W:"+str(CuHelper.GLBL['maxX'])+" H:"+str(CuHelper.GLBL['maxY']))
+
+		CuWrapper.initWrapper()
+		CuWrapper.__CuInit__()
+
+	@staticmethod
+	def getScreen():
+		return CuHelper.GLBL['screen']
+
+	@staticmethod
+	def app_initialized():
+		return CuHelper.GLBL['screen'] != None
+
+	@staticmethod
+	def paintAll():
+		#CuHelper.GLBL['mainWidget'].paintEvent(None)
+		for widget in CuHelper._updateWidget:
+			widget.paintEvent(None)
+		CuHelper._updateWidget = []
+		CuHelper.execPaint(CuHelper.getW(),CuHelper.getH())
+		curses.panel.update_panels()
+		CuHelper.GLBL['screen'].refresh()
+
+	@staticmethod
+	def refreshMain():
+		x, y = 0, 0
+		CuHelper.GLBL['maxY'], CuHelper.GLBL['maxX'] = CuHelper.GLBL['screen'].getmaxyx()
+		maxw, maxh = CuHelper.GLBL['mainWidget'].maximumSize()
+		minw, minh = CuHelper.GLBL['mainWidget'].minimumSize()
+
+		#logging.debug(__name__ + "  screen: " + str((CuHelper.GLBL['maxX'], CuHelper.GLBL['maxY'])))
+		#logging.debug(__name__ + "  min:    " + str(CuHelper.GLBL['mainWidget'].minimumSize()))
+		#logging.debug(__name__ + "  max:    " + str(CuHelper.GLBL['mainWidget'].maximumSize()))
+
+		if ( CuHelper.GLBL['maxX'] < minw ) or ( CuHelper.GLBL['maxY'] < minh ):
+			logging.debug(__name__ + "HIDE!!!")
+			CuHelper.GLBL['mainWidget'].hide()
+			CuHelper.GLBL['screen'].addstr(1, 1, "The Terminal Size")
+			CuHelper.GLBL['screen'].addstr(2, 1, "is too small...")
+			return
+		if not CuHelper.GLBL['mainWidget'].isVisible():
+			logging.debug(__name__ + "SHOW!!!")
+			CuHelper.GLBL['screen'].clear()
+
+		if CuHelper.GLBL['maxX'] > maxw : x = (CuHelper.GLBL['maxX']-maxw )//2
+		else: maxw = CuHelper.GLBL['maxX']
+
+		if CuHelper.GLBL['maxY'] > maxh : y = (CuHelper.GLBL['maxY']-maxh )//2
+		else: maxh = CuHelper.GLBL['maxY']
+
+		CuHelper.GLBL['mainWidget'].setGeometry(x, y, maxw, maxh)
+		CuHelper.GLBL['mainWidget'].show()
 
 
 class CuWrapper:

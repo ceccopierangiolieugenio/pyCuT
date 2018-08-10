@@ -21,7 +21,7 @@ ___signal_class_re = re.compile(r"^\s*class\s*[^()\s]*\s*\([^)]*\)\s*:")
 ___signal_class_id = 0
 def pycutSignal(*args, **kwargs):
 	'''
-		This amount of rubbish is required to mimic the "pyqtSignal()" behaviour
+		This pile of rubbish is required to mimic the "pyqtSignal()" behaviour
 		it can be used as Class or Object member and in both cases it refer
 		to the object when used
 	'''
