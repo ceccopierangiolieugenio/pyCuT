@@ -3,8 +3,8 @@
 '''
 
 import curses, curses.panel
-import logging
 
+from CuT import CuTCore
 from CuT.CuTCore import  CuT
 from CuT.CuTCore import CuEvent, CuMouseEvent, CuWheelEvent
 from CuT.CuTHelper import CuWrapper, CuHelper
@@ -27,16 +27,16 @@ class CuApplication:
 				event = CuHelper.GLBL['screen'].getch()
 			except KeyboardInterrupt as e:
 				# print "getch: " + str(e)
-				logging.debug(__name__ + " KI getch: " + str(e))
+				CuTCore.cuDebug(" KI getch: " + str(e))
 				event = curses.ERR
 				continue
 			except Exception as e:
 				# print "getch: " + str(e)
-				logging.debug(__name__ + " Exc getch: " + str(e))
+				CuTCore.cuDebug(" Exc getch: " + str(e))
 				event = curses.ERR
 				continue
 
-			# logging.debug(__name__ + "  event: " + hex(event))
+			# CuTCore.cuDebug("  event: " + hex(event))
 
 			if event == -1: continue
 
@@ -48,8 +48,8 @@ class CuApplication:
 				idm, x, y, z, bstate = curses.getmouse()
 				btype   = CuT.NoButton
 				button = None
-				# logging.debug(__name__ + "  mouse evt: " + str((idm, x, y, z, bstate)))
-				# logging.debug(__name__ + "  mouse evt: " + str(curses.BUTTON1_PRESSED))
+				# CuTCore.cuDebug("  mouse evt: " + str((idm, x, y, z, bstate)))
+				# CuTCore.cuDebug("  mouse evt: " + str(curses.BUTTON1_PRESSED))
 
 				if bstate == curses.REPORT_MOUSE_POSITION:
 						button = CuEvent.MouseMove
@@ -117,7 +117,7 @@ class CuApplication:
 
 			else:
 				# key pressed
-				logging.debug(__name__ + "  Pressed key " + str(event)) #, "("+keyname(event)+")")
+				CuTCore.cuDebug("  Pressed key " + str(event)) #, "("+keyname(event)+")")
 				if event == ord("q"): break
 
 

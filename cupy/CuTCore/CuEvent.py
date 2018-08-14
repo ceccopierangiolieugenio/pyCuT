@@ -2,8 +2,6 @@
     Event
 '''
 
-import logging
-
 from .CuT import CuT
 
 class CuEvent:

@@ -2,8 +2,6 @@
     Layout System
 '''
 
-import logging
-
 class CuLayoutItem:
 	_x, _y, _w, _h = 0, 0, 0, 0
 	def __init__(self):

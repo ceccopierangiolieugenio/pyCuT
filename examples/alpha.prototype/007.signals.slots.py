@@ -9,7 +9,7 @@ from CuT.CuTCore import  CuT, CuEvent, pycutSlot, pycutSignal
 from CuT.CuTGui import CuPainter
 from CuT.CuTHelper import CuWrapper
 
-# logging.basicConfig(filename='session.log',level=logging.DEBUG)
+logging.basicConfig(filename='session.log',level=logging.DEBUG)
 
 class CuTestInput(CuTWidgets.CuWidget):
 	_id, _ix, _iy, _iz, _bstate = 0, 0, 0, 0, 0

@@ -33,6 +33,11 @@ def pippo():
 def pippo_check():
 	curframe = inspect.currentframe()
 	calframe = inspect.getouterframes(curframe,1)
+	# pp.pprint(calframe)
+	print calframe[1][0]
+	print calframe[1][1]
+	print calframe[1][2]
+	print calframe[1][3]
 	if len(calframe) > 2:
 		if class_re.match(calframe[2][4][0]):
 			print("It's a Class Member")

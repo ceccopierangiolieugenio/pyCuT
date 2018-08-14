@@ -2,11 +2,11 @@
     Widget
 '''
 
-import logging
 import os
+
 from CuT.CuTHelper import CuWrapper, CuHelper
 from CuT.CuTCore import pycutSlot, pycutSignal
-from CuT.CuTCore import CuEvent, CuMouseEvent
+from CuT.CuTCore import CuT, CuEvent, CuMouseEvent
 from .CuLayout import *
 from .CuApplication import *
 
@@ -16,6 +16,9 @@ class CuWidget:
 	__slots__ = ('_data', '_extra')
 	def __init__(self, *args, **kwargs):
 		if not CuHelper.app_initialized():
+			# Abort:
+			#  i.e.
+			#    QWidget: Must construct a QApplication before a QWidget
 			print(self.__class__.__name__ + ": Must construct a CuApplication before a CuWidget")
 			os.abort()
 
@@ -41,6 +44,8 @@ class CuWidget:
 		self._data['win'] = CuWrapper.newWin(self, self._data['x'], self._data['y'], self._data['w'], self._data['h'])
 		self._data['layout'] = None
 		self._data['mouse'] = {'underMouse':False}
+		self._data['focus'] = False
+		self._data['focus_policy'] = CuT.NoFocus
 		self.hide()
 
 	def accessibleName(self):
@@ -145,8 +150,12 @@ class CuWidget:
 				self.mouseReleaseEvent(evt)
 			elif evt.button() == CuEvent.MouseButtonPress:
 				self.mousePressEvent(evt)
+				if self.focusPolicy() & CuT.ClickFocus == CuT.ClickFocus:
+					self.setFocus()
 		elif evt.type() == CuT.ForwardButton:
 			self.wheelEvent(evt)
+			if self.focusPolicy() & CuT.WheelFocus == CuT.WheelFocus:
+				self.setFocus()
 
 		# Trigger this event to the childs
 		if self._data['layout'] is not None:
@@ -240,7 +249,6 @@ class CuWidget:
 		self.update()
 
 	def setGeometry(self, x, y, w, h):
-		#logging.debug("FROM:"+str({"SELF":self._data['name'], "x":x,"y":y,"w":w,"h":h}))
 		self.resize(w, h)
 		self.move(x, y)
 
@@ -324,4 +332,38 @@ class CuWidget:
 
 	@pycutSlot()
 	def setFocus(self):
+		tmp = CuHelper.getFocus()
+		if tmp is not None:
+			tmp.clearFocus()
+			tmp.update()
+		CuHelper.setFocus(self)
+		self._data['focus'] = True
+
+	def clearFocus(self):
+		CuHelper.clearFocus()
+		self._data['focus'] = False
+
+	def focusPolicy(self):
+		return self._data['focus_policy']
+
+	def focusProxy(self):
+		pass
+	def focusWidget(self):
+		pass
+	def hasEditFocus(self):
+		pass
+
+	def hasFocus(self):
+		return self._data['focus']
+
+	def setEditFocus(self, enable):
+		pass
+
+	#def setFocus(self, reason):
+	#	pass
+
+	def setFocusPolicy(self, policy):
+		self._data['focus_policy'] = policy
+
+	def setFocusProxy(self, w):
 		pass

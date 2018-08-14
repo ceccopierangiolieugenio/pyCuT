@@ -1,5 +1,4 @@
 
-import logging
 import inspect
 import re
 
@@ -15,8 +14,6 @@ def pycutSlot(*args, **kwargs):
 		return func
 	return pycutSlot_d
 
-# logging.basicConfig(filename='session.log',level=logging.DEBUG)
-
 ___signal_class_re = re.compile(r"^\s*class\s*[^()\s]*\s*\([^)]*\)\s*:")
 ___signal_class_id = 0
 def pycutSignal(*args, **kwargs):
@@ -30,7 +27,6 @@ def pycutSignal(*args, **kwargs):
 	if len(calframe) > 2:
 		if ___signal_class_re.match(calframe[2][4][0]):
 			# It's a Class Member
-			# logging.debug("Signal As Class Member: " + calframe[1][4][0])
 			global ___signal_class_id
 			___signal_class_id += 1
 			# Create a unique name to identify this Signal in the object
@@ -45,7 +41,6 @@ def pycutSignal(*args, **kwargs):
 			ret = property(tmp_prop)
 		else:
 			# It's NOT a Class Member
-			# logging.debug("Signal As Object Member: " + calframe[1][4][0])
 			ret = pycutSignal_obj(*args, **kwargs)
 	del calframe
 	del curframe

@@ -1,5 +1,5 @@
 # pyCuT
-terminal graphic library ([TUI](https://en.wikipedia.org/wiki/Text-based_user_interface)) loosely based on QT api
+Text-based user interface library ([TUI](https://en.wikipedia.org/wiki/Text-based_user_interface)) loosely based on QT api
 
 # Note
 This project is in an extremely early stage.
