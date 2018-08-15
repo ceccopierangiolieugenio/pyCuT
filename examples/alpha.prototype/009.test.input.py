@@ -12,6 +12,7 @@ from CuT.CuTHelper import CuWrapper
 class CuTestInput(CuTWidgets.CuWidget):
 	_bstate = 0
 	_wheelAngle  = 0
+	_key = ' '
 
 	def __init__(self, *args, **kwargs):
 		CuTWidgets.CuWidget.__init__(self, *args, **kwargs)
@@ -24,6 +25,10 @@ class CuTestInput(CuTWidgets.CuWidget):
 		self._wheelAngle = evt.angleDelta()
 		self.update()
 
+	def keyPressEvent(self, evt):
+		self._key = evt.text()
+		self.update()
+
 	def event(self, evt):
 		if isinstance(evt, CuTCore.CuMouseEvent):
 			self._bstate = evt.button()
@@ -31,7 +36,6 @@ class CuTestInput(CuTWidgets.CuWidget):
 		return CuTWidgets.CuWidget.event(self, evt)
 
 	def paintEvent(self, event):
-		# logging.debug("Paint - evt:"+str(event)+" Name:"+self.accessibleName())
 		qp = CuPainter()
 		qp.begin(self)
 		qp.setPen(CuT.white)
@@ -53,6 +57,8 @@ class CuTestInput(CuTWidgets.CuWidget):
 			qp.drawText(3, 6, "Focus: [X]")
 		else:
 			qp.drawText(3, 6, "Focus: [ ]")
+		qp.setPen(CuT.yellow)
+		qp.drawText(3, 7, "Key Pressed: " + self._key.ljust(4))
 		qp.setPen(CuT.lightGray)
 		qp.drawText(3, 15, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 		qp.setPen(CuT.darkGreen)
@@ -69,34 +75,26 @@ def addFrame(widget):
 	f.setLayout(l)
 	return f
 
-log = None
-
-def cut_message_handler(mode, context, message):
-	if log is None:
-		return
-
-	if mode == CuTCore.CuTInfoMsg:
-		mode = 'INFO'
-	elif mode == CuTCore.CuTWarningMsg:
-		mode = 'WARNING'
-	elif mode == CuTCore.CuTCriticalMsg:
-		mode = 'CRITICAL'
-	elif mode == CuTCore.CuTFatalMsg:
-		mode = 'FATAL'
-	else:
-		mode = 'DEBUG'
-
-	log.appendPlainText('cut_message_handler: line: %d, func: %s(), file: %s' % (
-			context.line, context.function, context.file))
-	log.appendPlainText('  %s: %s' % (mode, message))
-	#logging.debug('cut_message_handler: line: %d, func: %s(), file: %s' % (
-	#		context.line, context.function, context.file))
-	#logging.debug('  %s: %s\n' % (mode, message))
-
-# logging.basicConfig(filename='session.log',level=logging.DEBUG)
-CuTCore.cuInstallMessageHandler(cut_message_handler)
-
 def main(screen):
+	log = None
+	def cut_message_handler(mode, context, message):
+		if log is None:
+			return
+		if mode == CuTCore.CuTInfoMsg:
+			mode = 'INFO'
+		elif mode == CuTCore.CuTWarningMsg:
+			mode = 'WARNING'
+		elif mode == CuTCore.CuTCriticalMsg:
+			mode = 'CRITICAL'
+		elif mode == CuTCore.CuTFatalMsg:
+			mode = 'FATAL'
+		else:
+			mode = 'DEBUG'
+		log.appendPlainText('cut_message_handler: line: %d, func: %s(), file: %s' % (
+				context.line, context.function, context.file))
+		log.appendPlainText('  %s: %s' % (mode, message))
+
+	CuTCore.cuInstallMessageHandler(cut_message_handler)
 	app = CuTWidgets.CuApplication(screen, sys.argv)
 
 	mainLayout = CuTWidgets.CuVBoxLayout()
@@ -122,7 +120,6 @@ def main(screen):
 	ti3.setFocusPolicy(CuT.NoFocus)
 	vlayout2.addWidget(ti3)
 
-	global log
 	log = CuTWidgets.CuPlainTextEdit(parent=mw)
 	log.setMaximumSize(10000,20)
 	log.setMinimumSize(10,20)
@@ -138,6 +135,5 @@ def main(screen):
 	mw.show()
 
 	app.exec_()
-
 
 CuWrapper.init(main)

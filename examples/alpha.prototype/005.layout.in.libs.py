@@ -45,44 +45,6 @@ class CuTestInput(CuTWidgets.CuWidget):
 		self.update()
 		return CuTWidgets.CuWidget.event(self, evt)
 
-class CuMovableTestInput(CuTestInput):
-	_state = None
-	_px, _py = 0, 0
-	_mx, _my = 0, 0
-
-	def paintEvent(self, event):
-		CuTestInput.paintEvent(self, event)
-		qp = CuPainter()
-		qp.begin(self)
-		qp.setPen(CuT.blue)
-		qp.drawText(3, 2, "[MOVABLE] " + str(self._state) + "    ")
-		qp.end()
-
-	def mousePressEvent(self, evt):
-		self._state = "Pressed"
-		self._px, self._py = self.pos()
-		self._mx, self._my = evt.screenPos()
-
-	def mouseReleaseEvent(self, evt):
-		self._state = None
-
-	def event(self, evt):
-		if isinstance(evt, CuTCore.CuMouseEvent):
-			x, y = evt.screenPos()
-			if evt.button() == CuEvent.MouseMove:
-				if self._state == "Pressed":
-					newx = self._px+x-self._mx
-					newy = self._py+y-self._my
-					if newx < 0: newx=0
-					if newy < 0: newy=0
-					if newx+self.width()  > CuTWidgets.CuApplication.getW() : newx=CuTWidgets.CuApplication.getW()-self.width()
-					if newy+self.height() > CuTWidgets.CuApplication.getH() : newy=CuTWidgets.CuApplication.getH()-self.height()
-					self.move(newx, newy);
-			self.update()
-			# return True
-			return CuTestInput.event(self, evt)
-
-
 
 def main(screen):
 	app = CuTWidgets.CuApplication(screen, sys.argv)
@@ -117,7 +79,7 @@ def main(screen):
 	tw3 = CuTestInput(parent=f1, name='tw3')
 	vlayout.addWidget(tw3)
 
-	mtw1 = CuMovableTestInput(parent=f1, name='mtw1')
+	mtw1 = CuTestInput(parent=f1, name='mtw1')
 	vlayout.addWidget(mtw1)
 
 	mw.setLayout(layout)

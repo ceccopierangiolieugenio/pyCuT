@@ -6,7 +6,7 @@ import curses, curses.panel
 
 from CuT import CuTCore
 from CuT.CuTCore import  CuT
-from CuT.CuTCore import CuEvent, CuMouseEvent, CuWheelEvent
+from CuT.CuTCore import CuEvent, CuMouseEvent, CuWheelEvent, CuKeyEvent
 from CuT.CuTHelper import CuWrapper, CuHelper
 
 class CuApplication:
@@ -52,51 +52,51 @@ class CuApplication:
 				# CuTCore.cuDebug("  mouse evt: " + str(curses.BUTTON1_PRESSED))
 
 				if bstate == curses.REPORT_MOUSE_POSITION:
-						button = CuEvent.MouseMove
-						btype = CuT.NoButton
+						btype = CuEvent.MouseMove
+						button = CuT.NoButton
 
 				elif bstate == curses.BUTTON1_PRESSED:
-						button = CuEvent.MouseButtonPress
-						btype = CuT.LeftButton
+						btype = CuEvent.MouseButtonPress
+						button = CuT.LeftButton
 				elif bstate == curses.BUTTON1_RELEASED:
-						button = CuEvent.MouseButtonRelease
-						btype = CuT.LeftButton
+						btype = CuEvent.MouseButtonRelease
+						button = CuT.LeftButton
 				elif bstate == curses.BUTTON1_CLICKED:
-						button = CuEvent.MouseButtonPress
-						btype = CuT.LeftButton
+						btype = CuEvent.MouseButtonPress
+						button = CuT.LeftButton
 
 				elif bstate == curses.BUTTON2_PRESSED:
-						button = CuEvent.MouseButtonPress
-						btype = CuT.RightButton
+						btype = CuEvent.MouseButtonPress
+						button = CuT.RightButton
 				elif bstate == curses.BUTTON2_RELEASED:
-						button = CuEvent.MouseButtonRelease
-						btype = CuT.RightButton
+						btype = CuEvent.MouseButtonRelease
+						button = CuT.RightButton
 				elif bstate == curses.BUTTON2_CLICKED:
-						button = CuEvent.MouseButtonPress
-						btype = CuT.RightButton
+						btype = CuEvent.MouseButtonPress
+						button = CuT.RightButton
 
 				elif bstate == curses.BUTTON3_PRESSED:
-						button = CuEvent.MouseButtonPress
-						btype = CuT.MidButton
+						btype = CuEvent.MouseButtonPress
+						button = CuT.MidButton
 				elif bstate == curses.BUTTON3_RELEASED:
-						button = CuEvent.MouseButtonRelease
-						btype = CuT.MidButton
+						btype = CuEvent.MouseButtonRelease
+						button = CuT.MidButton
 				elif bstate == curses.BUTTON3_CLICKED:
-						button = CuEvent.MouseButtonPress
-						btype = CuT.MidButton
+						btype = CuEvent.MouseButtonPress
+						button = CuT.MidButton
 
 				elif bstate == 0x010000: # Mouse Wheel UP
 						angleDelta = 120
-						btype = CuT.ForwardButton
+						btype = CuEvent.Wheel
 				elif bstate == 0x200000: # Mouse Wheel DOWN
 						angleDelta = -120
-						btype = CuT.ForwardButton
+						btype = CuEvent.Wheel
 
 				# if bstate == curses.BUTTON1_DOUBLE_CLICKED: event =  CuEvent.MouseButtonDblClick
 				# if bstate == curses.BUTTON1_TRIPLE_CLICKED: event =  CuEvent.MouseButtonPress
 
 				mwx, mwy = CuHelper.GLBL['mainWidget'].pos()
-				if btype == CuT.ForwardButton:
+				if btype == CuEvent.Wheel:
 					mouse_evt = CuWheelEvent(
 						type=btype,
 						pos  = {'x':x-mwx, 'y':y-mwy},
@@ -119,6 +119,14 @@ class CuApplication:
 				# key pressed
 				CuTCore.cuDebug("  Pressed key " + str(event)) #, "("+keyname(event)+")")
 				if event == ord("q"): break
+				focusWidget = CuHelper.getFocus()
+				if focusWidget is not None and event < 128:
+					key_evt = CuKeyEvent(
+						type = CuEvent.KeyPress,
+						key  = event,
+						text = str(unichr(event)))
+					focusWidget.event(key_evt)
+
 
 
 

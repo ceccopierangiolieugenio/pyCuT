@@ -69,6 +69,8 @@ class CuWidget:
 	def wheelEvent(self, evt): pass
 	def enterEvent(self, evt): pass
 	def leaveEvent(self, evt): pass
+	def keyPressEvent(self, evt): pass
+	def keyReleaseEvent(self, evt): pass
 
 	@staticmethod
 	def _broadcastLeaveEvent(evt, layout):
@@ -142,21 +144,23 @@ class CuWidget:
 
 	def event(self, evt):
 		# handle own events
-		if evt.type() == CuT.NoButton:
-			if evt.button() == CuEvent.MouseMove:
+		if evt.type() == CuEvent.MouseMove:
+			if evt.button() == CuT.NoButton:
 				self.mouseMoveEvent(evt)
-		elif evt.type() == CuT.LeftButton or evt.type() == CuT.RightButton or evt.type() == CuT.MidButton:
-			if   evt.button() == CuEvent.MouseButtonRelease:
-				self.mouseReleaseEvent(evt)
-			elif evt.button() == CuEvent.MouseButtonPress:
-				self.mousePressEvent(evt)
-				if self.focusPolicy() & CuT.ClickFocus == CuT.ClickFocus:
-					self.setFocus()
-		elif evt.type() == CuT.ForwardButton:
+		elif   evt.type() == CuEvent.MouseButtonRelease:
+			self.mouseReleaseEvent(evt)
+		elif evt.type() == CuEvent.MouseButtonPress:
+			self.mousePressEvent(evt)
+			if self.focusPolicy() & CuT.ClickFocus == CuT.ClickFocus:
+				self.setFocus()
+		elif evt.type() == CuEvent.Wheel:
 			self.wheelEvent(evt)
 			if self.focusPolicy() & CuT.WheelFocus == CuT.WheelFocus:
 				self.setFocus()
-
+		elif evt.type() == CuEvent.KeyPress:
+			self.keyPressEvent(evt)
+		elif evt.type() == CuEvent.KeyRelease:
+			self.keyReleaseEvent(evt)
 		# Trigger this event to the childs
 		if self._data['layout'] is not None:
 			return CuWidget._eventLayoutHandle(evt, self._data['layout'])

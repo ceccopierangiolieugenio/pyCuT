@@ -89,8 +89,8 @@ class CuMovableTestInput(CuTestInput):
 		qp.end()
 
 	def mousePressEvent(self, evt):
-		logging.debug("evt:"+str(evt.type())+" Name:"+self.accessibleName())
-		if evt.type() == CuT.LeftButton:
+		logging.debug("evt:"+str(evt.button())+" Name:"+self.accessibleName())
+		if evt.button() == CuT.LeftButton:
 			self._state = "Pressed"
 			self._px, self._py = self.pos()
 			self._mx, self._my = evt.screenPos()
@@ -101,7 +101,7 @@ class CuMovableTestInput(CuTestInput):
 	def event(self, evt):
 		if isinstance(evt, CuTCore.CuMouseEvent):
 			x, y = evt.screenPos()
-			if evt.button() == CuEvent.MouseMove:
+			if evt.type() == CuEvent.MouseMove:
 				if self._state == "Pressed":
 					newx = self._px+x-self._mx
 					newy = self._py+y-self._my
