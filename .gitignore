@@ -2,3 +2,4 @@ bkup
 *.log
 *.stackdump
 *.pyc
+*.swp

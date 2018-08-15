@@ -69,7 +69,12 @@ def addFrame(widget):
 	f.setLayout(l)
 	return f
 
+log = None
+
 def cut_message_handler(mode, context, message):
+	if log is None:
+		return
+
 	if mode == CuTCore.CuTInfoMsg:
 		mode = 'INFO'
 	elif mode == CuTCore.CuTWarningMsg:
@@ -80,22 +85,24 @@ def cut_message_handler(mode, context, message):
 		mode = 'FATAL'
 	else:
 		mode = 'DEBUG'
-	logging.debug('cut_message_handler: line: %d, func: %s(), file: %s' % (
-			context.line, context.function, context.file))
-	logging.debug('  %s: %s\n' % (mode, message))
 
-logging.basicConfig(filename='session.log',level=logging.DEBUG)
+	log.appendPlainText('cut_message_handler: line: %d, func: %s(), file: %s' % (
+			context.line, context.function, context.file))
+	log.appendPlainText('  %s: %s' % (mode, message))
+	#logging.debug('cut_message_handler: line: %d, func: %s(), file: %s' % (
+	#		context.line, context.function, context.file))
+	#logging.debug('  %s: %s\n' % (mode, message))
+
+# logging.basicConfig(filename='session.log',level=logging.DEBUG)
 CuTCore.cuInstallMessageHandler(cut_message_handler)
 
 def main(screen):
 	app = CuTWidgets.CuApplication(screen, sys.argv)
 
-	CuTCore.cuDebug('something informative')
-
 	mainLayout = CuTWidgets.CuVBoxLayout()
 
 	mw = CuTWidgets.CuMainWindow(name='MW')
-	mw.setMaximumSize(120,60)
+	mw.setMaximumSize(180,60)
 	mw.setMinimumSize(80,30)
 
 	layout = CuTWidgets.CuHBoxLayout()
@@ -115,9 +122,12 @@ def main(screen):
 	ti3.setFocusPolicy(CuT.NoFocus)
 	vlayout2.addWidget(ti3)
 
+	global log
 	log = CuTWidgets.CuPlainTextEdit(parent=mw)
 	log.setMaximumSize(10000,20)
 	log.setMinimumSize(10,20)
+
+	CuTCore.cuDebug('Test LOG!!!')
 
 	layout.addItem(vlayout2)
 

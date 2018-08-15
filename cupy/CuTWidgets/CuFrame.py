@@ -17,6 +17,8 @@ class CuFrame(CuWidget):
 	VLine = 0x0005 #QFrame draws a vertical line that frames nothing (useful as separator)
 	WinPanel = 0x0003 #draws a rectangular panel that can be raised or sunken like those in Windows 2000. Specifying this shape sets the line width to 2 pixels. WinPanel is provided for compatibility. For GUI style independence we recommend using StyledPanel instead.
 
+	__slots__ = ('_lineWidth')
+
 	def __init__(self, *args, **kwargs):
 		self._lineWidth = 1
 		CuWidget.__init__(self, *args, **kwargs)
