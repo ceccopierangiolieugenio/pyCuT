@@ -3,7 +3,11 @@
 '''
 
 class CuLayoutItem:
+	__slots__ = ('_x', '_y', '_w', '_h', '_sMax', '_sMaxVal', '_sMin', '_sMinVal')
 	_x, _y, _w, _h = 0, 0, 0, 0
+	_sMax,    _sMin    = False, False
+	_sMaxVal, _sMinVal = 0, 0
+
 	def __init__(self):
 		pass
 	def minimumSize(self):
@@ -101,32 +105,32 @@ class CuHBoxLayout(CuLayout):
 	def minimumWidth(self):
 		''' process the widgets and get the min size '''
 		minw = 0
-		for widget in self._items:
-			w1  = widget.minimumWidth()
+		for item in self.children():
+			w1  = item.minimumWidth()
 			minw += w1
 		return minw
 
 	def minimumHeight(self):
 		''' process the widgets and get the min size '''
 		minh = CuLayout.minimumHeight(self)
-		for widget in self._items:
-			h1  = widget.minimumHeight()
+		for item in self.children():
+			h1  = item.minimumHeight()
 			if h1 > minh : minh = h1
 		return minh
 
 	def maximumWidth(self):
 		''' process the widgets and get the min size '''
 		maxw = 0
-		for widget in self._items:
-			w1 = widget.maximumWidth()
+		for item in self.children():
+			w1 = item.maximumWidth()
 			maxw += w1
 		return maxw
 
 	def maximumHeight(self):
 		''' process the widgets and get the min size '''
 		maxh = CuLayout.maximumHeight(self)
-		for widget in self._items:
-			h1  = widget.maximumHeight()
+		for item in self.children():
+			h1  = item.maximumHeight()
 			if h1 < maxh : maxh = h1
 		return maxh
 
@@ -136,16 +140,46 @@ class CuHBoxLayout(CuLayout):
 		leftWidgets = numWidgets
 		freeWidth = w
 		newx, newy = x, y
+		# Loop to check the resizable space
 		for item in self.children():
+			item._sMax = False
+			item._sMin = False
+		iterate = True
+		while iterate and leftWidgets > 0:
+			iterate = False
 			sliceSize = freeWidth//leftWidgets
-			maxw = item.maximumWidth()
-			minw = item.minimumWidth()
-			if   sliceSize > maxw: sliceSize = maxw
-			elif sliceSize < minw: sliceSize = minw
-			item.setGeometry(newx, newy, sliceSize, h)
-			newx += sliceSize
-			freeWidth -= sliceSize
-			leftWidgets -= 1
+			for item in self.children():
+				if item._sMax or item._sMin: continue
+				maxs = item.maximumWidth()
+				mins = item.minimumWidth()
+				if sliceSize > maxs:
+					freeWidth -= maxs
+					iterate = True
+					item._sMax = True
+					item._sMaxVal = maxs
+					leftWidgets -= 1
+				elif sliceSize < mins:
+					freeWidth -= mins
+					leftWidgets -= 1
+					slicesize = freeWidth//leftWidgets
+					iterate = True
+					item._sMin = True
+					item._sMinVal = mins
+
+		# loop and set the geometry of any item
+		for item in self.children():
+			if item._sMax:
+				item.setGeometry(newx, newy, item._sMaxVal, h)
+				newy += item._sMaxVal
+			elif item._sMin:
+				item.setGeometry(newx, newy, item._sMinVal, h)
+				newy += item._sMinVal
+			else:
+				sliceSize = freeWidth//leftWidgets
+				item.setGeometry(newx, newy, sliceSize, h)
+				newx += sliceSize
+				freeWidth -= sliceSize
+				leftWidgets -= 1
 			if isinstance(item, CuWidgetItem) and not item.isEmpty():
 				item.widget().update()
 				item.widget().getWin().zTop()
@@ -160,32 +194,32 @@ class CuVBoxLayout(CuLayout):
 	def minimumWidth(self):
 		''' process the widgets and get the min size '''
 		minw = CuLayout.minimumWidth(self)
-		for widget in self._items:
-			w1  = widget.minimumWidth()
+		for item in self.children():
+			w1  = item.minimumWidth()
 			if w1 > minw : minw = w1
 		return minw
 
 	def minimumHeight(self):
 		''' process the widgets and get the min size '''
 		minh = 0
-		for widget in self._items:
-			h1  = widget.minimumHeight()
+		for item in self.children():
+			h1  = item.minimumHeight()
 			minh += h1
 		return minh
 
 	def maximumWidth(self):
 		''' process the widgets and get the min size '''
 		maxw = CuLayout.maximumWidth(self)
-		for widget in self._items:
-			w1  = widget.maximumWidth()
+		for item in self.children():
+			w1  = item.maximumWidth()
 			if w1 < maxw : maxw = w1
 		return maxw
 
 	def maximumHeight(self):
 		''' process the widgets and get the min size '''
 		maxh = 0
-		for widget in self._items:
-			h1 = widget.maximumHeight()
+		for item in self.children():
+			h1 = item.maximumHeight()
 			maxh += h1
 		return maxh
 
@@ -195,16 +229,46 @@ class CuVBoxLayout(CuLayout):
 		leftWidgets = numWidgets
 		freeHeight = h
 		newx, newy = x, y
+		# Loop to check the resizable space
 		for item in self.children():
+			item._sMax = False
+			item._sMin = False
+		iterate = True
+		while iterate and leftWidgets > 0:
+			iterate = False
 			sliceSize = freeHeight//leftWidgets
-			maxh = item.maximumHeight()
-			minh = item.minimumHeight()
-			if   sliceSize > maxh: sliceSize = maxh
-			elif sliceSize < minh: sliceSize = minh
-			item.setGeometry(newx, newy, w, sliceSize)
-			newy += sliceSize
-			freeHeight -= sliceSize
-			leftWidgets -= 1
+			for item in self.children():
+				if item._sMax or item._sMin: continue
+				maxs = item.maximumHeight()
+				mins = item.minimumHeight()
+				if sliceSize > maxs:
+					freeHeight -= maxs
+					iterate = True
+					item._sMax = True
+					item._sMaxVal = maxs
+					leftWidgets -= 1
+				elif sliceSize < mins:
+					freeHeight -= mins
+					leftWidgets -= 1
+					slicesize = freeHeight//leftWidgets
+					iterate = True
+					item._sMin = True
+					item._sMinVal = mins
+
+		# loop and set the geometry of any item
+		for item in self.children():
+			if item._sMax:
+				item.setGeometry(newx, newy, w, item._sMaxVal)
+				newy += item._sMaxVal
+			elif item._sMin:
+				item.setGeometry(newx, newy, w, item._sMinVal)
+				newy += item._sMinVal
+			else:
+				sliceSize = freeHeight//leftWidgets
+				item.setGeometry(newx, newy, w, sliceSize)
+				newy += sliceSize
+				freeHeight -= sliceSize
+				leftWidgets -= 1
 			if isinstance(item, CuWidgetItem) and not item.isEmpty():
 				item.widget().update()
 				item.widget().getWin().zTop()

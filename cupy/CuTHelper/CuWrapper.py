@@ -44,8 +44,8 @@ class CuWin:
 	def show(self):
 		self._panel.show()
 
-	def drawString(self, x, y, str, fg, bg):
-		self._bufPaint['string'].append({'x':x, 'y':y, 'str':str, 'fg':fg, 'bg':bg})
+	def drawString(self, x, y, strg, fg, bg):
+		self._bufPaint['string'].append({'x':x, 'y':y, 'str':strg, 'fg':fg, 'bg':bg})
 		CuHelper.addPaintBuffer(self)
 
 	def execPaint(self, winw, winh):
@@ -58,7 +58,12 @@ class CuWin:
 			else: w = self._bufPaint['resize']['w']
 			if self._bufPaint['resize']['h'] > winh: h = winh
 			else: h = self._bufPaint['resize']['h']
-			self._win.resize(h, w)
+			# CuTCore.cuDebug('resize(h, w):' + str([h,w]) )
+			if h > 0 and w > 0:
+				self._win.resize(h, w)
+			else:
+				self._panel.hide()
+				return
 
 		if self._bufPaint['move'] is not None:
 			# Avoid the panel outside the terminal
@@ -66,6 +71,7 @@ class CuWin:
 			else: x = self._bufPaint['move']['x']
 			if self._bufPaint['move']['y']+h > winh: y = winh-h-1
 			else: y = self._bufPaint['move']['y']
+			# CuTCore.cuDebug('move(y, x):' + str([x,y]) )
 			self._panel.move(y, x)
 
 		if self._bufPaint['box']:
@@ -88,7 +94,7 @@ class CuWin:
 		for ds in self._bufPaint['string']:
 			x = ds['x']
 			y = ds['y']
-			str = ds['str']
+			strg = ds['str']
 			fg = ds['fg']
 			bg = ds['bg']
 			c = curses.color_pair(0)
@@ -117,16 +123,16 @@ class CuWin:
 				of the window (lower right edge), the cursor goes "off screen"
 				and NCurses return an error
 			'''
-			strlen = len(str)
+			strlen = len(strg)
 			#ww, wh = self._widget.size()
 			if (y<0) or (y>h-1) or (x>w-1) or (x+strlen<0):
 				continue
 			if (x+strlen>w):
-				str = str[:(w-x)]
+				strg = strg[:(w-x)]
 			if y == h-1 and (x+strlen)>=w :
-				self._win.insstr(y, x, str, c)
+				self._win.insstr(y, x, strg, c)
 			else:
-				self._win.addstr(y, x, str, c)
+				self._win.addstr(y, x, strg, c)
 		self.resetBufPaint()
 
 class CuHelper:
