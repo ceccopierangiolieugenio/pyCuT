@@ -7,7 +7,6 @@ from CuT.CuTCore import  CuT
 
 class CuPainter:
 	__slots__ = ('_device','_pen')
-
 	def __init__(self, device=None):
 		self._device = device
 		self._pen = {'fg':CuT.white, 'bg':CuT.black}

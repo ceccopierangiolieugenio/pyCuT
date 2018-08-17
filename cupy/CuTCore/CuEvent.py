@@ -159,7 +159,6 @@ class CuEvent:
 	ZOrderChange                     = 126   # The widget's z-order has changed. This event is never sent to top level windows.
 
 	__slots__ = ('_type')
-
 	def __init__(self, type=None):
 		self._type = type;
 
@@ -252,11 +251,11 @@ class CuWheelEvent(CuEvent):
 	def angleDelta(self):
 		return self._angleDelta
 
-''' CuWheelEvent
-	ref: http://doc.qt.io/qt-5/qwheelevent.html
+''' CuKeyEvent
+	ref: http://doc.qt.io/qt-5/qkeyevent.html
 '''
 class CuKeyEvent(CuEvent):
-	__slots__ = ('_key')
+	__slots__ = ('_key','_text')
 	def __init__(self, type=None, key='', text=''):
 		CuEvent.__init__(self, type=type )
 		self._key  = key
@@ -267,3 +266,18 @@ class CuKeyEvent(CuEvent):
 
 	def text(self):
 		return self._text
+
+class CuFocusEvent(CuEvent):
+	__slots__ = ('_reason')
+	def __init__(self, type=None, reason=CuT.OtherFocusReason):
+		CuEvent.__init__(self, type=type )
+		self._reason  = reason
+
+	def gotFocus(self):
+		return self.type() == CuEvent.FocusIn
+
+	def lostFocus(self):
+		return self.type() == CuEvent.FocusOut
+
+	def reason(self):
+		return self._reason

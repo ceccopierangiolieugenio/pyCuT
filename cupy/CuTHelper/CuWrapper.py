@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import curses, curses.panel
+import locale
 
 from CuT import CuTCore
 from CuT.CuTCore import  CuT
@@ -144,6 +145,29 @@ class CuHelper:
 		'focusWidget' : None
 	}
 
+	class CursorType(int): pass
+	disabledCursor = 0
+	insertCursor   = 1
+	replaceCursor  = 2
+	@staticmethod
+	def enableCursor(t=insertCursor):
+		try:
+			curses.curs_set(t)
+		except Exception as e:
+			curses.curs_set(CuHelper.insertCursor)
+
+	@staticmethod
+	def disableCursor():
+		curses.curs_set(False)
+
+	@staticmethod
+	def moveCursor(x=0, y=0, widget=None):
+		if widget is not None:
+			nx, ny = CuHelper.absPos(widget)
+			x += nx
+			y += ny
+		CuHelper.GLBL['screen'].move(y,x)
+
 	@staticmethod
 	def setFocus(widget):
 		CuHelper.GLBL['focusWidget'] = widget
@@ -200,8 +224,10 @@ class CuHelper:
 
 	@staticmethod
 	def __CuInit__(screen):
-		curses.curs_set(False)
+		locale.setlocale(locale.LC_ALL,"")
+		# curses.curs_set(False)
 		# curses.curs_set(1)
+		CuHelper.disableCursor()
 		screen.keypad(1)
 		curses.mousemask(curses.ALL_MOUSE_EVENTS | curses.REPORT_MOUSE_POSITION)
 		curses.mouseinterval(0)

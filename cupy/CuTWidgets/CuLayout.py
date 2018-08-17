@@ -4,11 +4,11 @@
 
 class CuLayoutItem:
 	__slots__ = ('_x', '_y', '_w', '_h', '_sMax', '_sMaxVal', '_sMin', '_sMinVal')
-	_x, _y, _w, _h = 0, 0, 0, 0
-	_sMax,    _sMin    = False, False
-	_sMaxVal, _sMinVal = 0, 0
-
 	def __init__(self):
+		self._x, self._y = 0, 0
+		self._w, self._h = 0, 0
+		self._sMax,    self._sMin    = False, False
+		self._sMaxVal, self._sMinVal = 0, 0
 		pass
 	def minimumSize(self):
 		return self.minimumWidth(), self.minimumHeight()

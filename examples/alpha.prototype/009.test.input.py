@@ -25,7 +25,7 @@ class CuTestInput(CuTWidgets.CuWidget):
 		self._wheelAngle = evt.angleDelta()
 		self.update()
 
-	def keyPressEvent(self, evt):
+	def keyReleaseEvent(self, evt):
 		self._key = evt.text()
 		self.update()
 
@@ -90,8 +90,8 @@ def main(screen):
 			mode = 'FATAL'
 		else:
 			mode = 'DEBUG'
-		log.appendPlainText('cut_message_handler: line: %d, func: %s(), file: %s' % (
-				context.line, context.function, context.file))
+		#log.appendPlainText('cut_message_handler: line: %d, func: %s(), file: %s' % (
+		#		context.line, context.function, context.file))
 		log.appendPlainText('  %s: %s' % (mode, message))
 
 	CuTCore.cuInstallMessageHandler(cut_message_handler)
@@ -120,15 +120,23 @@ def main(screen):
 	ti3.setFocusPolicy(CuT.NoFocus)
 	vlayout2.addWidget(ti3)
 
+	lineEdit = CuTWidgets.CuLineEdit(parent=mw)
+
 	log = CuTWidgets.CuPlainTextEdit(parent=mw)
 	log.setMaximumSize(10000,20)
 	log.setMinimumSize(10,20)
+
+	file_in = open('utf-8.txt')
+	for line in file_in:
+		log.appendPlainText(line.strip())
+	file_in.close()
 
 	CuTCore.cuDebug('Test LOG!!!')
 
 	layout.addItem(vlayout2)
 
 	mainLayout.addItem(layout)
+	mainLayout.addWidget(lineEdit)
 	mainLayout.addWidget(log)
 
 	mw.setLayout(mainLayout)

@@ -6,7 +6,7 @@ import os
 
 from CuT.CuTHelper import CuWrapper, CuHelper
 from CuT.CuTCore import pycutSlot, pycutSignal
-from CuT.CuTCore import CuT, CuEvent, CuMouseEvent
+from CuT.CuTCore import CuT, CuEvent, CuMouseEvent, CuFocusEvent
 from .CuLayout import *
 from .CuApplication import *
 
@@ -335,13 +335,21 @@ class CuWidget:
 	'''
 
 	@pycutSlot()
-	def setFocus(self):
+	def setFocus(self, reason=CuT.OtherFocusReason):
 		tmp = CuHelper.getFocus()
 		if tmp is not None:
 			tmp.clearFocus()
+			tmp.focusOutEvent(
+					CuFocusEvent(
+						type=CuEvent.FocusOut,
+						reason=reason))
 			tmp.update()
 		CuHelper.setFocus(self)
 		self._data['focus'] = True
+		self.focusInEvent(
+				CuFocusEvent(
+					type=CuEvent.FocusIn,
+					reason=reason))
 
 	def clearFocus(self):
 		CuHelper.clearFocus()
@@ -350,18 +358,13 @@ class CuWidget:
 	def focusPolicy(self):
 		return self._data['focus_policy']
 
-	def focusProxy(self):
-		pass
-	def focusWidget(self):
-		pass
-	def hasEditFocus(self):
-		pass
-
+	def focusProxy(self):   pass
+	def focusWidget(self):  pass
+	def hasEditFocus(self): pass
 	def hasFocus(self):
 		return self._data['focus']
 
-	def setEditFocus(self, enable):
-		pass
+	def setEditFocus(self, enable): pass
 
 	#def setFocus(self, reason):
 	#	pass
@@ -369,5 +372,7 @@ class CuWidget:
 	def setFocusPolicy(self, policy):
 		self._data['focus_policy'] = policy
 
-	def setFocusProxy(self, w):
-		pass
+	def setFocusProxy(self, w): pass
+
+	def focusInEvent(self, evt): pass
+	def focusOutEvent(self, evt): pass
