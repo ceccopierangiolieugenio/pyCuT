@@ -9,7 +9,7 @@ class CuPainter:
 	__slots__ = ('_device','_pen')
 	def __init__(self, device=None):
 		self._device = device
-		self._pen = {'fg':CuT.white, 'bg':CuT.black}
+		self._pen = {'fg':CuT.white, 'bg':CuT.NoBrush}
 
 	def begin(self, device):
 		self._device = device
@@ -17,28 +17,31 @@ class CuPainter:
 	def end(self):
 		pass
 
+	def setBrush(self, color):
+		self._pen['bg'] = color
+
 	def setPen(self, color):
 		self._pen['fg'] = color
-		if color   == CuT.color0: pass
-		elif color == CuT.color1: pass
-		elif color == CuT.black: pass
-		elif color == CuT.white: pass
-		elif color == CuT.darkGray: pass
-		elif color == CuT.gray: pass
-		elif color == CuT.lightGray: pass
-		elif color == CuT.red: pass
-		elif color == CuT.green: pass
-		elif color == CuT.blue: pass
-		elif color == CuT.cyan: pass
-		elif color == CuT.magenta: pass
-		elif color == CuT.yellow: pass
-		elif color == CuT.darkRed: pass
-		elif color == CuT.darkGreen: pass
-		elif color == CuT.darkBlue: pass
-		elif color == CuT.darkCyan: pass
-		elif color == CuT.darkMagenta: pass
-		elif color == CuT.darkYellow: pass
-		elif color == CuT.transparent: pass
+		# if color   == CuT.color0: pass
+		# elif color == CuT.color1: pass
+		# elif color == CuT.black: pass
+		# elif color == CuT.white: pass
+		# elif color == CuT.darkGray: pass
+		# elif color == CuT.gray: pass
+		# elif color == CuT.lightGray: pass
+		# elif color == CuT.red: pass
+		# elif color == CuT.green: pass
+		# elif color == CuT.blue: pass
+		# elif color == CuT.cyan: pass
+		# elif color == CuT.magenta: pass
+		# elif color == CuT.yellow: pass
+		# elif color == CuT.darkRed: pass
+		# elif color == CuT.darkGreen: pass
+		# elif color == CuT.darkBlue: pass
+		# elif color == CuT.darkCyan: pass
+		# elif color == CuT.darkMagenta: pass
+		# elif color == CuT.darkYellow: pass
+		# elif color == CuT.transparent: pass
 
 	'''
 		void	drawText(const QPointF &position, const QString &text)

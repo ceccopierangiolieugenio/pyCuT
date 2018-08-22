@@ -1,5 +1,8 @@
 
 class CuT:
+
+	NoBrush = 0
+
 	class GlobalColor(int): pass
 	color0      = 1 # type: 'Qt.GlobalColor'
 	color1      = 2

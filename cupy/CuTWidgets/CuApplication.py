@@ -183,7 +183,7 @@ class CuApplication:
 								a.append(ch)
 							CuTCore.cuDebug(" Next Unicode "+str(ch)+" "+hex(ch)+" "+oct(ch))
 						ktype = CuEvent.KeyRelease
-						text = struct.pack("b"*len(a),*a)
+						text = struct.pack("b"*len(a),*a).decode('utf-8')
 					else:
 						#
 						# Key Command

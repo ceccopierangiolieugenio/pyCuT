@@ -4,7 +4,8 @@ import curses, curses.panel
 import locale
 
 from CuT import CuTCore
-from CuT.CuTCore import  CuT
+from CuT.CuTCore import  CuT, cuDebug
+
 
 class CuWin:
 	__slots__ = ('_widget', '_win', '_panel', '_bufPaint')
@@ -44,6 +45,9 @@ class CuWin:
 
 	def show(self):
 		self._panel.show()
+
+	def setWinColor(self, fg, bg):
+		self._win.bkgd(' ',curses.color_pair(CuWrapper.colorIdx(fg, bg)))
 
 	def drawString(self, x, y, strg, fg, bg):
 		self._bufPaint['string'].append({'x':x, 'y':y, 'str':strg, 'fg':fg, 'bg':bg})
@@ -98,27 +102,55 @@ class CuWin:
 			strg = ds['str']
 			fg = ds['fg']
 			bg = ds['bg']
+			fgc = CuWrapper.WR_COL_WHITE
+			bgc = CuWrapper.WR_COL_BLACK
+			mod = 0
 			c = curses.color_pair(0)
+			c = curses.color_pair(CuWrapper.colorIdx(fgc, bgc))
 			if   fg == CuT.color0:    pass
 			elif fg == CuT.color1:    pass
 			elif fg == CuT.black:     pass
-			elif fg == CuT.white:       c = curses.color_pair(0)
-			elif fg == CuT.darkGray:    c = curses.color_pair(1 + curses.COLOR_BLACK   + curses.COLOR_BLACK * 8) | curses.A_BOLD 
-			elif fg == CuT.gray:        c = curses.color_pair(1 + curses.COLOR_BLACK   + curses.COLOR_BLACK * 8) | curses.A_BOLD
-			elif fg == CuT.lightGray:   c = curses.color_pair(1 + curses.COLOR_BLACK   + curses.COLOR_BLACK * 8) | curses.A_BOLD
-			elif fg == CuT.red:         c = curses.color_pair(1 + curses.COLOR_RED     + curses.COLOR_BLACK * 8)
-			elif fg == CuT.green:       c = curses.color_pair(1 + curses.COLOR_GREEN   + curses.COLOR_BLACK * 8)
-			elif fg == CuT.blue:        c = curses.color_pair(1 + curses.COLOR_BLUE    + curses.COLOR_BLACK * 8)
-			elif fg == CuT.cyan:        c = curses.color_pair(1 + curses.COLOR_CYAN    + curses.COLOR_BLACK * 8)
-			elif fg == CuT.magenta:     c = curses.color_pair(1 + curses.COLOR_MAGENTA + curses.COLOR_BLACK * 8)
-			elif fg == CuT.yellow:      c = curses.color_pair(1 + curses.COLOR_YELLOW  + curses.COLOR_BLACK * 8)
-			elif fg == CuT.darkRed:     c = curses.color_pair(1 + curses.COLOR_RED     + curses.COLOR_BLACK * 8) | curses.A_DIM
-			elif fg == CuT.darkGreen:   c = curses.color_pair(1 + curses.COLOR_GREEN   + curses.COLOR_BLACK * 8) | curses.A_DIM
-			elif fg == CuT.darkBlue:    c = curses.color_pair(1 + curses.COLOR_BLUE    + curses.COLOR_BLACK * 8) | curses.A_DIM
-			elif fg == CuT.darkCyan:    c = curses.color_pair(1 + curses.COLOR_CYAN    + curses.COLOR_BLACK * 8) | curses.A_DIM
-			elif fg == CuT.darkMagenta: c = curses.color_pair(1 + curses.COLOR_MAGENTA + curses.COLOR_BLACK * 8) | curses.A_DIM
-			elif fg == CuT.darkYellow:  c = curses.color_pair(1 + curses.COLOR_YELLOW  + curses.COLOR_BLACK * 8) | curses.A_DIM
+			elif fg == CuT.white:     pass
+			elif fg == CuT.darkGray:    fgc = CuWrapper.WR_COL_BLACK   ; mod |= curses.A_BOLD
+			elif fg == CuT.gray:        fgc = CuWrapper.WR_COL_BLACK   ; mod |= curses.A_BOLD
+			elif fg == CuT.lightGray:   fgc = CuWrapper.WR_COL_BLACK   ; mod |= curses.A_BOLD
+			elif fg == CuT.red:         fgc = CuWrapper.WR_COL_RED
+			elif fg == CuT.green:       fgc = CuWrapper.WR_COL_GREEN
+			elif fg == CuT.blue:        fgc = CuWrapper.WR_COL_BLUE
+			elif fg == CuT.cyan:        fgc = CuWrapper.WR_COL_CYAN
+			elif fg == CuT.magenta:     fgc = CuWrapper.WR_COL_MAGENTA
+			elif fg == CuT.yellow:      fgc = CuWrapper.WR_COL_YELLOW
+			elif fg == CuT.darkRed:     fgc = CuWrapper.WR_COL_RED     ; mod |= curses.A_DIM
+			elif fg == CuT.darkGreen:   fgc = CuWrapper.WR_COL_GREEN   ; mod |= curses.A_DIM
+			elif fg == CuT.darkBlue:    fgc = CuWrapper.WR_COL_BLUE    ; mod |= curses.A_DIM
+			elif fg == CuT.darkCyan:    fgc = CuWrapper.WR_COL_CYAN    ; mod |= curses.A_DIM
+			elif fg == CuT.darkMagenta: fgc = CuWrapper.WR_COL_MAGENTA ; mod |= curses.A_DIM
+			elif fg == CuT.darkYellow:  fgc = CuWrapper.WR_COL_YELLOW  ; mod |= curses.A_DIM
 			elif fg == CuT.transparent: pass
+
+			if   bg == CuT.color0:    pass
+			elif bg == CuT.color1:    pass
+			elif bg == CuT.black:     pass
+			elif bg == CuT.white:     pass
+			elif bg == CuT.darkGray:    bgc = CuWrapper.WR_COL_BLACK
+			elif bg == CuT.gray:        bgc = CuWrapper.WR_COL_BLACK
+			elif bg == CuT.lightGray:   bgc = CuWrapper.WR_COL_BLACK
+			elif bg == CuT.red:         bgc = CuWrapper.WR_COL_RED
+			elif bg == CuT.green:       bgc = CuWrapper.WR_COL_GREEN
+			elif bg == CuT.blue:        bgc = CuWrapper.WR_COL_BLUE
+			elif bg == CuT.cyan:        bgc = CuWrapper.WR_COL_CYAN
+			elif bg == CuT.magenta:     bgc = CuWrapper.WR_COL_MAGENTA
+			elif bg == CuT.yellow:      bgc = CuWrapper.WR_COL_YELLOW
+			elif bg == CuT.darkRed:     bgc = CuWrapper.WR_COL_RED
+			elif bg == CuT.darkGreen:   bgc = CuWrapper.WR_COL_GREEN
+			elif bg == CuT.darkBlue:    bgc = CuWrapper.WR_COL_BLUE
+			elif bg == CuT.darkCyan:    bgc = CuWrapper.WR_COL_CYAN
+			elif bg == CuT.darkMagenta: bgc = CuWrapper.WR_COL_MAGENTA
+			elif bg == CuT.darkYellow:  bgc = CuWrapper.WR_COL_YELLOW
+			elif bg == CuT.transparent: pass
+
+			c = curses.color_pair(CuWrapper.colorIdx(fgc, bgc)) | mod
+
 			''' Corner case:
 				if the last character of the string goes in the end
 				of the window (lower right edge), the cursor goes "off screen"
@@ -179,6 +211,10 @@ class CuHelper:
 	@staticmethod
 	def clearFocus():
 		CuHelper.GLBL['focusWidget'] = None
+
+	@staticmethod
+	def setWidgetColor(widget, fg, bg):
+		widget._data['win'].setWinColor(fg, bg)
 
 	@staticmethod
 	def setMainWidget(widget):
@@ -324,6 +360,20 @@ class CuWrapper:
 	def newWin(widget, x, y, w, h):
 		return CuWin(widget, x, y, w, h)
 
+	# WR_COL_DEFAULT  = 0
+	WR_COL_BLACK    = 0
+	WR_COL_RED      = 1
+	WR_COL_GREEN    = 2
+	WR_COL_YELLOW   = 3
+	WR_COL_BLUE     = 4
+	WR_COL_MAGENTA  = 5
+	WR_COL_CYAN     = 6
+	WR_COL_WHITE    = 7
+
+	@staticmethod
+	def colorIdx(fg, bg):
+		return ( (fg) + (bg) * 8 ) + 1
+
 	@staticmethod
 	def initWrapper():
 		''' Init Colors 
@@ -340,7 +390,8 @@ class CuWrapper:
 		curses.start_color()
 		for bg in range(8):
 			for fg in range(8):
-				idx = ( fg + bg * 8 ) + 1
+				idx = CuWrapper.colorIdx(fg, bg)
+				# cuDebug('idx:'+str(idx)+' fg:'+str(fg)+' bg:'+str(bg))
 				curses.init_pair(idx, fg, bg)
 
 		# CuT.color0 = 1 # type: 'Qt.GlobalColor'

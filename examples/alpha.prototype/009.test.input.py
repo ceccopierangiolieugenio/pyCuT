@@ -59,8 +59,57 @@ class CuTestInput(CuTWidgets.CuWidget):
 			qp.drawText(3, 6, "Focus: [ ]")
 		qp.setPen(CuT.yellow)
 		qp.drawText(3, 7, "Key Pressed: " + self._key.ljust(4))
+
+		qp.setPen(CuT.color0)
+		qp.drawText(3, 9,  "color0      abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.setPen(CuT.color1)
+		qp.drawText(3, 10, "color1      abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.setPen(CuT.black)
+		qp.drawText(3, 11, "black       abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.setPen(CuT.white)
+		qp.drawText(3, 12, "white       abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.setPen(CuT.darkGray)
+		qp.drawText(3, 13, "darkGray    abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.setPen(CuT.gray)
+		qp.drawText(3, 14, "gray        abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 		qp.setPen(CuT.lightGray)
-		qp.drawText(3, 15, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.drawText(3, 15, "lightGray   abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.setPen(CuT.red)
+		qp.drawText(3, 16, "red         abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.setPen(CuT.green)
+		qp.drawText(3, 17, "green       abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.setPen(CuT.blue)
+		qp.drawText(3, 18, "blue        abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.setPen(CuT.cyan)
+		qp.drawText(3, 19, "cyan        abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.setPen(CuT.magenta)
+		qp.drawText(3, 20, "magenta     abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.setPen(CuT.yellow)
+		qp.drawText(3, 21, "yellow      abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.setPen(CuT.darkRed)
+		qp.drawText(3, 22, "darkRed     abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.setPen(CuT.darkGreen)
+		qp.drawText(3, 23, "darkGreen   abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.setPen(CuT.darkBlue)
+		qp.drawText(3, 24, "darkBlue    abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.setPen(CuT.darkCyan)
+		qp.drawText(3, 25, "darkCyan    abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.setPen(CuT.darkMagenta)
+		qp.drawText(3, 26, "darkMagenta abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.setPen(CuT.darkYellow)
+		qp.drawText(3, 27, "darkYellow  abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+		qp.setPen(CuT.transparent)
+		qp.drawText(3, 28, "transparent abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+		qp.setPen(CuT.yellow)
+		qp.setBrush(CuT.red)
+		qp.drawText(3, 30, " Eugenio ")
+		qp.setPen(CuT.red)
+		qp.setBrush(CuT.yellow)
+		qp.drawText(12, 30, " Parodi ")
+
+		qp.setBrush(CuT.black)
+
 		qp.setPen(CuT.darkGreen)
 		qp.drawText(0, 0,               "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 		qp.drawText(0, self.height()-1, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
@@ -78,8 +127,8 @@ def addFrame(widget):
 def main(screen):
 	log = None
 	def cut_message_handler(mode, context, message):
-		if log is None:
-			return
+		#if log is None:
+		#	return
 		if mode == CuTCore.CuTInfoMsg:
 			mode = 'INFO'
 		elif mode == CuTCore.CuTWarningMsg:
@@ -92,9 +141,11 @@ def main(screen):
 			mode = 'DEBUG'
 		#log.appendPlainText('cut_message_handler: line: %d, func: %s(), file: %s' % (
 		#		context.line, context.function, context.file))
-		log.appendPlainText('  %s: %s' % (mode, message))
-
+		#log.appendPlainText('  %s: %s' % (mode, message))
+		logging.debug('  %s: %s\n' % (mode, message))
+	logging.basicConfig(filename='session.log',level=logging.DEBUG)
 	CuTCore.cuInstallMessageHandler(cut_message_handler)
+
 	app = CuTWidgets.CuApplication(screen, sys.argv)
 
 	mainLayout = CuTWidgets.CuVBoxLayout()
@@ -121,6 +172,8 @@ def main(screen):
 	vlayout2.addWidget(ti3)
 
 	lineEdit = CuTWidgets.CuLineEdit(parent=mw)
+	lineEdit.setText("Eugenio Parodi")
+	vlayout2.addWidget(lineEdit)
 
 	log = CuTWidgets.CuPlainTextEdit(parent=mw)
 	log.setMaximumSize(10000,20)
@@ -136,7 +189,7 @@ def main(screen):
 	layout.addItem(vlayout2)
 
 	mainLayout.addItem(layout)
-	mainLayout.addWidget(lineEdit)
+	#mainLayout.addWidget(lineEdit)
 	mainLayout.addWidget(log)
 
 	mw.setLayout(mainLayout)

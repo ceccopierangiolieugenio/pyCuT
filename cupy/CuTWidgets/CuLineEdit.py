@@ -34,14 +34,21 @@ class CuLineEdit(CuWidget):
 		self.setMinimumSize(5,1)
 
 	@pycutSlot(str)
-	def setText(self, str):
-		self._text = str
+	def setText(self, st):
+		self._text = st
+		self._cursorPosition = len(st)
 		self.update()
 
 	@pycutSlot()
 	def clear(self):
 		self._text = u''
 		self.update()
+
+	def enterEvent(self, evt):
+		CuHelper.setWidgetColor(self, CuWrapper.WR_COL_BLACK, CuWrapper.WR_COL_BLUE)
+
+	def leaveEvent(self, evt):
+		CuHelper.setWidgetColor(self, CuWrapper.WR_COL_BLACK, CuWrapper.WR_COL_BLACK)
 
 	def focusInEvent(self, evt):
 		# cuDebug("Evt: "+str(evt))
@@ -60,6 +67,10 @@ class CuLineEdit(CuWidget):
 		qp = CuPainter()
 		qp.begin(self)
 		qp.setPen(CuT.white)
+		#qp.setBrush(CuT.darkCyan)
+		text = self._text.encode('utf-8')+" "
+		# qp.drawText(0, 0, '[')
+		# qp.drawText(self.width()-1, 0, ']')
 		qp.drawText(0, 0, self._text.encode('utf-8')+" ")
 		# qp.drawText(20,0,u'£@£¬`漢__あ__'.encode('utf-8'))
 		qp.end()
@@ -77,7 +88,7 @@ class CuLineEdit(CuWidget):
 			c = self._cursorPosition
 			pre  = self._text[:c]
 			post = self._text[c:]
-			self._text = (pre+evt.text().decode("utf-8")+post)
+			self._text = (pre+evt.text()+post)
 			self._cursorPosition += 1
 			# cuDebug((str(self._cursorPosition)+pre+"<-->"+post+"<---->"+evt.text().decode("utf-8")).encode('utf-8'))
 		cpos = self._cursorPosition - self._displayOffset
