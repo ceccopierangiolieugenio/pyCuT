@@ -12,6 +12,7 @@ from CuT import CuTCore
 from CuT.CuTCore import  CuT
 from CuT.CuTCore import CuEvent, CuMouseEvent, CuWheelEvent, CuKeyEvent
 from CuT.CuTHelper import CuWrapper, CuHelper
+from CuT.CuTHelper.urwid.compat import bytes3
 
 class CuApplication:
 	def __init__(self, screen, argv):

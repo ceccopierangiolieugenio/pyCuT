@@ -70,3 +70,6 @@ class CuPainter:
 	'''
 	def drawText(self, tx, ty, text):
 		self._device.getWin().drawString(tx, ty, text, self._pen['fg'], self._pen['bg'])
+
+	def eraseRect(self, ex, ey, ew, eh):
+		self._device.getWin().eraseRect(ex, ey, ew, eh)

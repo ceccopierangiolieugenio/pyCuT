@@ -6,6 +6,9 @@ import locale
 from CuT import CuTCore
 from CuT.CuTCore import  CuT, cuDebug
 
+#from .urwid.util import (MetaSuper, decompose_tagmarkup, calc_width,
+#    is_wide_char, move_prev_char, move_next_char)
+
 
 class CuWin:
 	__slots__ = ('_widget', '_win', '_panel', '_bufPaint')
@@ -19,7 +22,7 @@ class CuWin:
 		self._panel.top()
 
 	def resetBufPaint(self):
-		self._bufPaint = {'move':None, 'resize':None, 'string':[], 'box':False}
+		self._bufPaint = {'move':None, 'resize':None, 'erase':[], 'string':[], 'box':False}
 
 	def box(self):
 		self._bufPaint['box']=True
@@ -51,6 +54,10 @@ class CuWin:
 
 	def drawString(self, x, y, strg, fg, bg):
 		self._bufPaint['string'].append({'x':x, 'y':y, 'str':strg, 'fg':fg, 'bg':bg})
+		CuHelper.addPaintBuffer(self)
+
+	def eraseRect(self, x, y, w, h):
+		self._bufPaint['erase'].append({'x':x, 'y':y, 'w':w, 'h':h})
 		CuHelper.addPaintBuffer(self)
 
 	def execPaint(self, winw, winh):
@@ -95,6 +102,10 @@ class CuWin:
 			self._win.addch(lry, ulx, curses.ACS_LLCORNER)
 			# CuTCore.cuDebug("boxch:" + u'わ'+ hex(curses.ACS_LLCORNER) )
 
+		for es in self._bufPaint['erase']:
+			for y in range(es['h']):
+				for x in range(es['w']):
+					self._win.delch(y+es['y'], x+es['x'])
 
 		for ds in self._bufPaint['string']:
 			x = ds['x']

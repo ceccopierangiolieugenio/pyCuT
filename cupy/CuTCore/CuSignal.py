@@ -90,8 +90,6 @@ class pycutSignal_obj():
 	def disconnect(self, *args, **kwargs):
 		for slot in args:
 			self._connected_slots.remove(slot)
-		else:
-			self._connected_slots = []
 
 	def emit(self, *args, **kwargs):
 		if len(args) != len(self._types):

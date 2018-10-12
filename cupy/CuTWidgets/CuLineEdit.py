@@ -22,12 +22,23 @@ class CuLineEdit(CuWidget):
 	LeadingPosition  = 0 # The widget is displayed to the left of the text when using layout direction Qt::LeftToRight or to the right when using Qt::RightToLeft, respectively.
 	TrailingPosition = 1 # The widget is displayed to the right of the text when using layout direction Qt::LeftToRight or to the left when using Qt::RightToLeft, respectively.
 
-	__slots__ = ('_text', '_cursorPosition', '_displayOffset')
+	''' Note of the textline sizes
+
+		LineEdit                 -------------------
+		Text                 abcdefghi
+		Cursor                     X
+		_displayOffset  [-4] <-->
+		_cursorPosition [ 3]     -->
+
+	'''
+
+	__slots__ = ('_text', '_cursorPosition', '_displayOffset', '_bgColor')
 	def __init__(self, *args, **kwargs):
 		CuWidget.__init__(self, *args, **kwargs)
 		self._text = u''
 		self._cursorPosition = 0
 		self._displayOffset = 0
+		self._bgColor = CuT.black
 		# Click/Tab focus, no Wheel focus
 		self.setFocusPolicy(CuT.StrongFocus)
 		self.setMaximumSize(1000000,1)
@@ -46,9 +57,13 @@ class CuLineEdit(CuWidget):
 
 	def enterEvent(self, evt):
 		CuHelper.setWidgetColor(self, CuWrapper.WR_COL_BLACK, CuWrapper.WR_COL_BLUE)
+		self._bgColor = CuT.blue
+		self.update()
 
 	def leaveEvent(self, evt):
 		CuHelper.setWidgetColor(self, CuWrapper.WR_COL_BLACK, CuWrapper.WR_COL_BLACK)
+		self._bgColor = CuT.black
+		self.update()
 
 	def focusInEvent(self, evt):
 		# cuDebug("Evt: "+str(evt))
@@ -67,11 +82,11 @@ class CuLineEdit(CuWidget):
 		qp = CuPainter()
 		qp.begin(self)
 		qp.setPen(CuT.white)
-		#qp.setBrush(CuT.darkCyan)
-		text = self._text.encode('utf-8')+" "
-		# qp.drawText(0, 0, '[')
-		# qp.drawText(self.width()-1, 0, ']')
-		qp.drawText(0, 0, self._text.encode('utf-8')+" ")
+		qp.setBrush(self._bgColor)
+		# Erase the first char after the string (useful in case of delete action)
+		if len(self._text) < self.width():
+			qp.eraseRect(len(self._text), 0, 1, 1)
+		qp.drawText(0, 0, self._text.encode('utf-8'))
 		# qp.drawText(20,0,u'£@£¬`漢__あ__'.encode('utf-8'))
 		qp.end()
 
@@ -83,6 +98,18 @@ class CuLineEdit(CuWidget):
 				pre  = self._text[:c-1]
 				post = self._text[c:]
 				self._text = pre+post
+				self._cursorPosition -= 1
+		elif evt.key() == CuT.Key_Delete:
+			if self._cursorPosition < len(self._text):
+				c = self._cursorPosition+1
+				pre  = self._text[:c-1]
+				post = self._text[c:]
+				self._text = pre+post
+		elif evt.key() == CuT.Key_Right:
+			if self._cursorPosition < len(self._text):
+				self._cursorPosition += 1
+		elif evt.key() == CuT.Key_Left:
+			if self._cursorPosition > 0:
 				self._cursorPosition -= 1
 		else:
 			c = self._cursorPosition
