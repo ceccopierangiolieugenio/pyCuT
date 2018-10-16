@@ -172,7 +172,7 @@ def main(screen):
 	vlayout2.addWidget(ti3)
 
 	lineEdit = CuTWidgets.CuLineEdit(parent=mw)
-	lineEdit.setText("Eugenio Parodi")
+	lineEdit.setText("Eugenio Parodi 123456789 - abcdefghijklmnopqrstu")
 	vlayout2.addWidget(lineEdit)
 
 	log = CuTWidgets.CuPlainTextEdit(parent=mw)

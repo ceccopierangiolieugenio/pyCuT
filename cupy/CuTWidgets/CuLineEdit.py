@@ -27,17 +27,18 @@ class CuLineEdit(CuWidget):
 		LineEdit                 -------------------
 		Text                 abcdefghi
 		Cursor                     X
-		_displayOffset  [-4] <-->
-		_cursorPosition [ 3]     -->
+		_displayOffset  [4]  <-->
+		_cursorPosition [3]  ------>
 
 	'''
 
-	__slots__ = ('_text', '_cursorPosition', '_displayOffset', '_bgColor')
+	__slots__ = ('_text', '_cursorPosition', '_displayOffset', '_bgColor', '_lastDisplayLen')
 	def __init__(self, *args, **kwargs):
 		CuWidget.__init__(self, *args, **kwargs)
 		self._text = u''
 		self._cursorPosition = 0
-		self._displayOffset = 0
+		self._displayOffset  = 0
+		self._lastDisplayLen = 0
 		self._bgColor = CuT.black
 		# Click/Tab focus, no Wheel focus
 		self.setFocusPolicy(CuT.StrongFocus)
@@ -84,11 +85,24 @@ class CuLineEdit(CuWidget):
 		qp.setPen(CuT.white)
 		qp.setBrush(self._bgColor)
 		# Erase the first char after the string (useful in case of delete action)
-		if len(self._text) < self.width():
-			qp.eraseRect(len(self._text), 0, 1, 1)
-		qp.drawText(0, 0, self._text.encode('utf-8'))
+		newDisplayLen = len(self._text) - self._displayOffset
+		if newDisplayLen > self.width():
+			newDisplayLen = self.width()
+		# cuDebug("W:"+str(self.width())+"  NewDl: "+str(newDisplayLen)+"  lastdl: "+str(self._lastDisplayLen))
+		if self._lastDisplayLen > newDisplayLen:			
+			qp.eraseRect(newDisplayLen, 0, self._lastDisplayLen - newDisplayLen, 1)
+		self._lastDisplayLen = newDisplayLen
+		qp.drawText(0, 0, self._text[self._displayOffset:].encode('utf-8'))
 		# qp.drawText(20,0,u'£@£¬`漢__あ__'.encode('utf-8'))
 		qp.end()
+
+	def mousePressEvent(self, evt):
+		x, y = evt.pos()
+		x += self._displayOffset
+		if x > len(self._text):
+			self._cursorPosition = len(self._text)
+		else:
+			self._cursorPosition = x
 
 	def keyReleaseEvent(self, evt):
 		# cuDebug("Key: "+str(evt.key())+"  txt: ->"+evt.text()+"<- len:" + str(len(self._text)))
@@ -111,6 +125,10 @@ class CuLineEdit(CuWidget):
 		elif evt.key() == CuT.Key_Left:
 			if self._cursorPosition > 0:
 				self._cursorPosition -= 1
+		elif evt.key() == CuT.Key_Home:
+			self._cursorPosition = 0
+		elif evt.key() == CuT.Key_End:
+			self._cursorPosition = len(self._text)
 		else:
 			c = self._cursorPosition
 			pre  = self._text[:c]
@@ -118,6 +136,10 @@ class CuLineEdit(CuWidget):
 			self._text = (pre+evt.text()+post)
 			self._cursorPosition += 1
 			# cuDebug((str(self._cursorPosition)+pre+"<-->"+post+"<---->"+evt.text().decode("utf-8")).encode('utf-8'))
+		if self._cursorPosition - self._displayOffset >= self.width() - 1:
+			self._displayOffset = self._cursorPosition - self.width() + 1
+		if self._cursorPosition - self._displayOffset < 0:
+			self._displayOffset = self._cursorPosition
 		cpos = self._cursorPosition - self._displayOffset
 		if cpos >= 0 and cpos < self.width():
 			CuHelper.enableCursor()

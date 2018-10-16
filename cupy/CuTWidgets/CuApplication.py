@@ -121,7 +121,7 @@ class CuApplication:
 				CuHelper.refreshMain()
 			else:
 				# key pressed
-				CuTCore.cuDebug("  Pressed key "+str(event)+" "+hex(event)+" "+oct(event)) #, "("+keyname(event)+")")
+				# CuTCore.cuDebug("  Pressed key "+str(event)+" "+hex(event)+" "+oct(event)) #, "("+keyname(event)+")")
 				if event == ord("q"): break
 				focusWidget = CuHelper.getFocus()
 				if focusWidget is not None:
@@ -193,26 +193,26 @@ class CuApplication:
 						# elif event == curses.KEY_BREAK:       CuTCore.cuDebug("  KEY_BREAK")      # (0401)  Break key (unreliable)
 						# elif event == curses.KEY_SRESET:      CuTCore.cuDebug("  KEY_SRESET")     # (0530)  Soft (partial) reset (unreliable)
 						# elif event == curses.KEY_RESET:       CuTCore.cuDebug("  KEY_RESET")      # (0531)  Reset or hard reset (unreliable)
-						if   event == curses.KEY_DOWN:        key = CuT.Key_Down     ; CuTCore.cuDebug("  KEY_DOWN")       # (0402)  down-arrow key
-						elif event == curses.KEY_UP:          key = CuT.Key_Up       ; CuTCore.cuDebug("  KEY_UP")         # (0403)  up-arrow key
-						elif event == curses.KEY_LEFT:        key = CuT.Key_Left     ; CuTCore.cuDebug("  KEY_LEFT")       # (0404)  left-arrow key
-						elif event == curses.KEY_RIGHT:       key = CuT.Key_Right    ; CuTCore.cuDebug("  KEY_RIGHT")      # (0405)  right-arrow key
-						elif event == curses.KEY_HOME:        key = CuT.Key_Home     ; CuTCore.cuDebug("  KEY_HOME")       # (0406)  home key
-						elif event == 0x7f:                   key = CuT.Key_Backspace; CuTCore.cuDebug("  KEY_BACKSPACE")  # (0x7f)  backspace key
-						elif event == curses.KEY_BACKSPACE:   key = CuT.Key_Backspace; CuTCore.cuDebug("  KEY_BACKSPACE")  # (0407)  backspace key
+						if   event == curses.KEY_DOWN:        key = CuT.Key_Down      #; CuTCore.cuDebug("  KEY_DOWN")       # (0402)  down-arrow key
+						elif event == curses.KEY_UP:          key = CuT.Key_Up        #; CuTCore.cuDebug("  KEY_UP")         # (0403)  up-arrow key
+						elif event == curses.KEY_LEFT:        key = CuT.Key_Left      #; CuTCore.cuDebug("  KEY_LEFT")       # (0404)  left-arrow key
+						elif event == curses.KEY_RIGHT:       key = CuT.Key_Right     #; CuTCore.cuDebug("  KEY_RIGHT")      # (0405)  right-arrow key
+						elif event == curses.KEY_HOME:        key = CuT.Key_Home      #; CuTCore.cuDebug("  KEY_HOME")       # (0406)  home key
+						elif event == 0x7f:                   key = CuT.Key_Backspace #; CuTCore.cuDebug("  KEY_BACKSPACE")  # (0x7f)  backspace key
+						elif event == curses.KEY_BACKSPACE:   key = CuT.Key_Backspace #; CuTCore.cuDebug("  KEY_BACKSPACE")  # (0407)  backspace key
 						# elif event == curses.KEY_F0:          CuTCore.cuDebug("  KEY_F0")         # (0410)  Function keys.  Space for 64
-						elif event == curses.KEY_F0+ 1:       key = CuT.Key_F1       ; CuTCore.cuDebug("  KEY_F1 ")        # (KEY_F0+ 1)  Value of function key  1
-						elif event == curses.KEY_F0+ 2:       key = CuT.Key_F2       ; CuTCore.cuDebug("  KEY_F2 ")        # (KEY_F0+ 2)  Value of function key  2
-						elif event == curses.KEY_F0+ 3:       key = CuT.Key_F3       ; CuTCore.cuDebug("  KEY_F3 ")        # (KEY_F0+ 3)  Value of function key  3
-						elif event == curses.KEY_F0+ 4:       key = CuT.Key_F4       ; CuTCore.cuDebug("  KEY_F4 ")        # (KEY_F0+ 4)  Value of function key  4
-						elif event == curses.KEY_F0+ 5:       key = CuT.Key_F5       ; CuTCore.cuDebug("  KEY_F5 ")        # (KEY_F0+ 5)  Value of function key  5
-						elif event == curses.KEY_F0+ 6:       key = CuT.Key_F6       ; CuTCore.cuDebug("  KEY_F6 ")        # (KEY_F0+ 6)  Value of function key  6
-						elif event == curses.KEY_F0+ 7:       key = CuT.Key_F7       ; CuTCore.cuDebug("  KEY_F7 ")        # (KEY_F0+ 7)  Value of function key  7
-						elif event == curses.KEY_F0+ 8:       key = CuT.Key_F8       ; CuTCore.cuDebug("  KEY_F8 ")        # (KEY_F0+ 8)  Value of function key  8
-						elif event == curses.KEY_F0+ 9:       key = CuT.Key_F9       ; CuTCore.cuDebug("  KEY_F9 ")        # (KEY_F0+ 9)  Value of function key  9
-						elif event == curses.KEY_F0+10:       key = CuT.Key_F10      ; CuTCore.cuDebug("  KEY_F10")        # (KEY_F0+10)  Value of function key 10
-						elif event == curses.KEY_F0+11:       key = CuT.Key_F11      ; CuTCore.cuDebug("  KEY_F11")        # (KEY_F0+11)  Value of function key 11
-						elif event == curses.KEY_F0+12:       key = CuT.Key_F12      ; CuTCore.cuDebug("  KEY_F12")        # (KEY_F0+12)  Value of function key 12
+						elif event == curses.KEY_F0+ 1:       key = CuT.Key_F1       #; CuTCore.cuDebug("  KEY_F1 ")        # (KEY_F0+ 1)  Value of function key  1
+						elif event == curses.KEY_F0+ 2:       key = CuT.Key_F2       #; CuTCore.cuDebug("  KEY_F2 ")        # (KEY_F0+ 2)  Value of function key  2
+						elif event == curses.KEY_F0+ 3:       key = CuT.Key_F3       #; CuTCore.cuDebug("  KEY_F3 ")        # (KEY_F0+ 3)  Value of function key  3
+						elif event == curses.KEY_F0+ 4:       key = CuT.Key_F4       #; CuTCore.cuDebug("  KEY_F4 ")        # (KEY_F0+ 4)  Value of function key  4
+						elif event == curses.KEY_F0+ 5:       key = CuT.Key_F5       #; CuTCore.cuDebug("  KEY_F5 ")        # (KEY_F0+ 5)  Value of function key  5
+						elif event == curses.KEY_F0+ 6:       key = CuT.Key_F6       #; CuTCore.cuDebug("  KEY_F6 ")        # (KEY_F0+ 6)  Value of function key  6
+						elif event == curses.KEY_F0+ 7:       key = CuT.Key_F7       #; CuTCore.cuDebug("  KEY_F7 ")        # (KEY_F0+ 7)  Value of function key  7
+						elif event == curses.KEY_F0+ 8:       key = CuT.Key_F8       #; CuTCore.cuDebug("  KEY_F8 ")        # (KEY_F0+ 8)  Value of function key  8
+						elif event == curses.KEY_F0+ 9:       key = CuT.Key_F9       #; CuTCore.cuDebug("  KEY_F9 ")        # (KEY_F0+ 9)  Value of function key  9
+						elif event == curses.KEY_F0+10:       key = CuT.Key_F10      #; CuTCore.cuDebug("  KEY_F10")        # (KEY_F0+10)  Value of function key 10
+						elif event == curses.KEY_F0+11:       key = CuT.Key_F11      #; CuTCore.cuDebug("  KEY_F11")        # (KEY_F0+11)  Value of function key 11
+						elif event == curses.KEY_F0+12:       key = CuT.Key_F12      #; CuTCore.cuDebug("  KEY_F12")        # (KEY_F0+12)  Value of function key 12
 						# elif event == curses.KEY_DL:          CuTCore.cuDebug("  KEY_DL")         # (0510)  delete-line key
 						# elif event == curses.KEY_IL:          CuTCore.cuDebug("  KEY_IL")         # (0511)  insert-line key
 						elif event == curses.KEY_DC:          key = CuT.Key_Delete   ; CuTCore.cuDebug("  KEY_DC")         # (0512)  delete-character key
