@@ -185,53 +185,6 @@ class CuEvent:
 		self.m_accept = False
 
 
-''' CuMouseEvent
-	ref: http://doc.qt.io/qt-5/qmouseevent.html#x
-'''
-class CuMouseEvent(CuEvent):
-	__slots__ = ('_localPos', '_windowPos', '_screenPos', '_globalPos', '_button')
-	def __init__(self, type=None, localPos=None, windowPos=None, screenPos=None, button=CuT.NoButton):
-		CuEvent.__init__(self, type=type )
-		self._localPos  = localPos  if localPos  is not None else CuPoint(0, 0)
-		self._windowPos = windowPos if windowPos is not None else CuPoint(0, 0)
-		self._screenPos = screenPos if screenPos is not None else CuPoint(0, 0)
-		self._globalPos = screenPos if screenPos is not None else CuPoint(0, 0)
-		self._button=button
-
-	def globalPos(self):
-		return self._globalPos
-
-	# Returns the global x position of the mouse cursor at the time of the event.
-	def globalX(self):
-		return self._globalPos.x()
-
-	# Returns the global y position of the mouse cursor at the time of the event.
-	def globalY(self):
-		return self._globalPos.y()
-
-	# Returns the position of the mouse cursor, relative to the widget that received the event.
-	def pos(self):
-		return self._localPos
-
-	# Returns the position of the mouse cursor as a Point, relative to the screen that received the event.
-	def screenPos(self):
-		return self._screenPos
-
-	# Returns the position of the mouse cursor as a Point, relative to the window that received the event.
-	def windowPos(self):
-		return self._windowPos
-
-	# Returns the x position of the mouse cursor, relative to the widget that received the event.
-	def x(self):
-		return self._localPos.x()
-
-	# Returns the y position of the mouse cursor, relative to the widget that received the event.
-	def y(self):
-		return self._localPos.y()
-
-	def button(self):
-		return self._button
-
 
 ''' CuInputEvent
 	ref: http://doc.qt.io/qt-5/qinputevent.html
@@ -251,6 +204,56 @@ class CuInputEvent(CuEvent):
 
 	def setTimestamp(self, atimestamp):
 		self.ts = atimestamp
+
+
+''' CuMouseEvent
+	ref: http://doc.qt.io/qt-5/qmouseevent.html#x
+'''
+class CuMouseEvent(CuInputEvent):
+	__slots__ = ('l', 'w', 's', 'b')
+
+	def __init__(self, *args, **kwargs):
+		CuInputEvent.__init__(self, *args, **kwargs)
+		self.l = kwargs.get('localPos', CuPoint(0, 0))
+		self.w = kwargs.get('windowPos', CuPoint(0, 0))
+		self.s = kwargs.get('screenPos', CuPoint(0, 0))
+		self.b = kwargs.get('button', CuT.NoButton)
+
+	def globalPos(self):
+		return self.s
+
+	# Returns the global x position of the mouse cursor at the time of the event.
+	def globalX(self):
+		return self.s.x()
+
+	# Returns the global y position of the mouse cursor at the time of the event.
+	def globalY(self):
+		return self.s.y()
+
+	# Returns the position of the mouse cursor, relative to the widget that received the event.
+	def pos(self):
+		return self.l
+
+	# Returns the position of the mouse cursor as a Point, relative to the screen that received the event.
+	def screenPos(self):
+		return self.s
+
+	# Returns the position of the mouse cursor as a Point, relative to the window that received the event.
+	def windowPos(self):
+		return self.w
+
+	# Returns the x position of the mouse cursor, relative to the widget that received the event.
+	def x(self):
+		return self.l.x()
+
+	# Returns the y position of the mouse cursor, relative to the widget that received the event.
+	def y(self):
+		return self.l.y()
+
+	def button(self):
+		return self.b
+
+
 
 ''' CuWheelEvent
 	ref: http://doc.qt.io/qt-5/qwheelevent.html
