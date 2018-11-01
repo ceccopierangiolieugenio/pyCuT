@@ -1,7 +1,15 @@
 
 class CuT:
-
 	NoBrush = 0
+
+	class KeyboardModifier(int): pass
+	NoModifier          = 0x00000000 # No modifier key is pressed.
+	ShiftModifier       = 0x02000000 # A Shift key on the keyboard is pressed.
+	ControlModifier     = 0x04000000 # A Ctrl key on the keyboard is pressed.
+	AltModifier         = 0x08000000 # An Alt key on the keyboard is pressed.
+	MetaModifier        = 0x10000000 # A Meta key on the keyboard is pressed.
+	KeypadModifier      = 0x20000000 # A keypad button is pressed.
+	GroupSwitchModifier = 0x40000000 # X11 only. A Mode_switch key on the keyboard is pressed.
 
 	class GlobalColor(int): pass
 	color0      = 1 # type: 'Qt.GlobalColor'
@@ -550,6 +558,11 @@ class CuT:
 	ShortcutFocusReason     = 5 # The user typed a label's buddy shortcut
 	MenuBarFocusReason      = 6 # The menu bar took focus.
 	OtherFocusReason        = 7 # Another reason, usually application-specific.
+
+	class Orientation(int): pass
+	class Orientations(int): pass
+	Horizontal = 0x1
+	Vertical   = 0x2
 
 class CuPoint:
 	def __init__(self, x=0, y=0):

@@ -2,7 +2,7 @@
     Event
 '''
 
-from .CuT import CuT
+from .CuT import CuT, CuPoint
 
 class CuEvent:
 	'''
@@ -158,12 +158,31 @@ class CuEvent:
 	WinIdChange                      = 203   # The window system identifer for this native widget has changed.
 	ZOrderChange                     = 126   # The widget's z-order has changed. This event is never sent to top level windows.
 
-	__slots__ = ('_type')
-	def __init__(self, type=None):
-		self._type = type;
+	__slots__ = ('d', 't', 'posted', 'spont', 'm_accept')
+	def __init__(self, *args, **kwargs):
+		self.d = 0
+		self.t = kwargs.get('type', None)
+		self.posted   = False
+		self.spont    = False
+		self.m_accept = True
 
 	def type(self):
-		return self._type
+		return self.t
+
+	def spontaneous(self):
+		return self.spont
+
+	def setAccepted(self, accepted):
+		self.m_accept = accepted
+
+	def isAccepted(self):
+		return self.m_accept
+
+	def accept(self):
+		self.m_accept = True
+
+	def ignore(self):
+		self.m_accept = False
 
 
 ''' CuMouseEvent
@@ -171,70 +190,90 @@ class CuEvent:
 '''
 class CuMouseEvent(CuEvent):
 	__slots__ = ('_localPos', '_windowPos', '_screenPos', '_globalPos', '_button')
-	def __init__(self, type=None, localPos={'x':0, 'y':0}, windowPos={'x':0, 'y':0}, screenPos={'x':0, 'y':0}, button=CuT.NoButton):
+	def __init__(self, type=None, localPos=None, windowPos=None, screenPos=None, button=CuT.NoButton):
 		CuEvent.__init__(self, type=type )
-		self._localPos  = localPos
-		self._windowPos = windowPos
-		self._screenPos = screenPos
-		self._globalPos = screenPos
+		self._localPos  = localPos  if localPos  is not None else CuPoint(0, 0)
+		self._windowPos = windowPos if windowPos is not None else CuPoint(0, 0)
+		self._screenPos = screenPos if screenPos is not None else CuPoint(0, 0)
+		self._globalPos = screenPos if screenPos is not None else CuPoint(0, 0)
 		self._button=button
 
 	def globalPos(self):
-		return self._globalPos['x'], self._globalPos['y']
+		return self._globalPos
 
 	# Returns the global x position of the mouse cursor at the time of the event.
 	def globalX(self):
-		return self._globalPos['x']
+		return self._globalPos.x()
 
 	# Returns the global y position of the mouse cursor at the time of the event.
 	def globalY(self):
-		return self._globalPos['y']
+		return self._globalPos.y()
 
 	# Returns the position of the mouse cursor, relative to the widget that received the event.
 	def pos(self):
-		return self.x(), self.y()
+		return self._localPos
 
 	# Returns the position of the mouse cursor as a Point, relative to the screen that received the event.
 	def screenPos(self):
-		return self._screenPos['x'], self._screenPos['y']
+		return self._screenPos
 
 	# Returns the position of the mouse cursor as a Point, relative to the window that received the event.
 	def windowPos(self):
-		return self._windowPos['x'], self._windowPos['y']
+		return self._windowPos
 
 	# Returns the x position of the mouse cursor, relative to the widget that received the event.
 	def x(self):
-		return self._localPos['x']
+		return self._localPos.x()
 
 	# Returns the y position of the mouse cursor, relative to the widget that received the event.
 	def y(self):
-		return self._localPos['y']
+		return self._localPos.y()
 
 	def button(self):
 		return self._button
 
 
+''' CuInputEvent
+	ref: http://doc.qt.io/qt-5/qinputevent.html
+'''
+class CuInputEvent(CuEvent):
+	__slots__ = ('modState', 'ts')
+	def __init__(self, *args, **kwargs):
+		CuEvent.__init__(self, *args, **kwargs)
+		self.modState = kwargs.get('modifiers', CuT.NoModifier)
+		self.ts       = 0
+
+	def modifiers(self):
+		return self.modState
+
+	def timestamp(self):
+		return self.ts
+
+	def setTimestamp(self, atimestamp):
+		self.ts = atimestamp
+
 ''' CuWheelEvent
 	ref: http://doc.qt.io/qt-5/qwheelevent.html
 '''
-class CuWheelEvent(CuEvent):
-	__slots__ = ('_localPos', '_globalPos', '_angleDelta')
-	def __init__(self, type=None, pos={'x':0, 'y':0}, globalPos={'x':0, 'y':0}, angleDelta=0):
-		CuEvent.__init__(self, type=type )
-		self._localPos  = pos
-		self._globalPos = globalPos
-		self._angleDelta = angleDelta
+class CuWheelEvent(CuInputEvent):
+	__slots__ = ('p', 'g', 'angleD', 'invertedScrolling')
+	def __init__(self, *args, **kwargs):
+		CuInputEvent.__init__(self, *args, **kwargs)
+		self.p      = kwargs.get('pos', CuPoint())
+		self.g      = kwargs.get('globalPos', CuPoint())
+		self.angleD = kwargs.get('angleDelta', CuPoint())
+		self.invertedScrolling = False
 
 	def globalPos(self):
-		return self._globalPos['x'], self._globalPos['y']
+		return self.g
 
 	# Returns the global x position of the mouse cursor at the time of the event.
 	def globalX(self):
-		return self._globalPos['x']
+		return self.g.x()
 
 	# Returns the global y position of the mouse cursor at the time of the event.
 	def globalY(self):
-		return self._globalPos['y']
+		return self.g.y()
 
 	# Returns the position of the mouse cursor, relative to the widget that received the event.
 	def pos(self):
@@ -242,24 +281,27 @@ class CuWheelEvent(CuEvent):
 
 	# Returns the x position of the mouse cursor, relative to the widget that received the event.
 	def x(self):
-		return self._localPos['x']
+		return self.p.x()
 
 	# Returns the y position of the mouse cursor, relative to the widget that received the event.
 	def y(self):
-		return self._localPos['y']
+		return self.p.y()
 
 	def angleDelta(self):
-		return self._angleDelta
+		return self.angleD
+
+	def inverted(self):
+		return self.invertedScrolling
 
 ''' CuKeyEvent
 	ref: http://doc.qt.io/qt-5/qkeyevent.html
 '''
-class CuKeyEvent(CuEvent):
+class CuKeyEvent(CuInputEvent):
 	__slots__ = ('_key','_text')
-	def __init__(self, type=None, key='', text=''):
-		CuEvent.__init__(self, type=type )
-		self._key  = key
-		self._text = text
+	def __init__(self, *args, **kwargs):
+		CuInputEvent.__init__(self, *args, **kwargs)
+		self._key  = kwargs.get('key', '')
+		self._text = kwargs.get('text', '')
 
 	def key(self):
 		return self._key
@@ -269,9 +311,9 @@ class CuKeyEvent(CuEvent):
 
 class CuFocusEvent(CuEvent):
 	__slots__ = ('_reason')
-	def __init__(self, type=None, reason=CuT.OtherFocusReason):
-		CuEvent.__init__(self, type=type )
-		self._reason  = reason
+	def __init__(self, *args, **kwargs):
+		CuEvent.__init__(self, *args, **kwargs)
+		self._reason  = kwargs.get('reason', CuT.OtherFocusReason)
 
 	def gotFocus(self):
 		return self.type() == CuEvent.FocusIn

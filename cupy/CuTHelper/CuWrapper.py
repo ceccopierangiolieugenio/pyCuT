@@ -4,7 +4,7 @@ import curses, curses.panel
 import locale
 
 from CuT import CuTCore
-from CuT.CuTCore import  CuT, cuDebug
+from CuT.CuTCore import  CuT, CuPoint, cuDebug
 
 #from .urwid.util import (MetaSuper, decompose_tagmarkup, calc_width,
 #    is_wide_char, move_prev_char, move_next_char)
@@ -28,9 +28,9 @@ class CuWin:
 		self._bufPaint['box']=True
 
 	def move(self, x, y):
-		nx, ny = CuHelper.absParentPos(self._widget)
+		npos = CuHelper.absParentPos(self._widget)
 		# CuTCore.cuDebug("Move: x:"+str(nx+x)+" y:"+str(ny+y))
-		self._bufPaint['move']={'x':nx+x, 'y':ny+y}
+		self._bufPaint['move']={'x':npos.x()+x, 'y':npos.y()+y}
 		CuHelper.addPaintBuffer(self)
 
 	def clear(self):
@@ -143,9 +143,9 @@ class CuWin:
 			elif bg == CuT.color1:    pass
 			elif bg == CuT.black:     pass
 			elif bg == CuT.white:     pass
-			elif bg == CuT.darkGray:    bgc = CuWrapper.WR_COL_BLACK
-			elif bg == CuT.gray:        bgc = CuWrapper.WR_COL_BLACK
-			elif bg == CuT.lightGray:   bgc = CuWrapper.WR_COL_BLACK
+			elif bg == CuT.darkGray:    bgc = fgc ; fgc = CuWrapper.WR_COL_BLACK ; mod |= curses.A_BOLD | curses.A_REVERSE
+			elif bg == CuT.gray:        bgc = fgc ; fgc = CuWrapper.WR_COL_BLACK ; mod |= curses.A_BOLD | curses.A_REVERSE
+			elif bg == CuT.lightGray:   bgc = fgc ; fgc = CuWrapper.WR_COL_BLACK ; mod |= curses.A_BOLD | curses.A_REVERSE
 			elif bg == CuT.red:         bgc = CuWrapper.WR_COL_RED
 			elif bg == CuT.green:       bgc = CuWrapper.WR_COL_GREEN
 			elif bg == CuT.blue:        bgc = CuWrapper.WR_COL_BLUE
@@ -206,9 +206,9 @@ class CuHelper:
 	@staticmethod
 	def moveCursor(x=0, y=0, widget=None):
 		if widget is not None:
-			nx, ny = CuHelper.absPos(widget)
-			x += nx
-			y += ny
+			npos = CuHelper.absPos(widget)
+			x += npos.x()
+			y += npos.y()
 		CuHelper.GLBL['screen'].move(y,x)
 
 	@staticmethod
@@ -247,13 +247,13 @@ class CuHelper:
 
 	@staticmethod
 	def absPos(widget):
-		px, py = CuHelper.absParentPos(widget)
-		return widget.x()+px, widget.y()+py
+		pos = CuHelper.absParentPos(widget)
+		return widget.pos() + pos
 
 	@staticmethod
 	def absParentPos(widget):
 		if widget.parentWidget() is None:
-			return 0, 0
+			return CuPoint()
 		return CuHelper.absPos(widget.parentWidget())
 
 	_paintBuffer = []

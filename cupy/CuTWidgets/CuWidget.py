@@ -6,7 +6,7 @@ import os
 
 from CuT.CuTHelper import CuWrapper, CuHelper
 from CuT.CuTCore import pycutSlot, pycutSignal
-from CuT.CuTCore import CuT, CuEvent, CuMouseEvent, CuFocusEvent
+from CuT.CuTCore import CuT, CuEvent, CuMouseEvent, CuFocusEvent, CuPoint, CuSize
 from .CuLayout import *
 from .CuApplication import *
 
@@ -32,16 +32,15 @@ class CuWidget:
 
 		self._data['parent'] = kwargs.get('parent', None )
 		self._data['name'] = kwargs.get('name', '')
-		self._data['x'] = kwargs.get('x', 0)
-		self._data['y'] = kwargs.get('y', 0)
-		self._data['w'] = kwargs.get('w', CuHelper.getW())
-		self._data['h'] = kwargs.get('h', CuHelper.getH())
+		self._data['pos'] = CuPoint(kwargs.get('x', 0), kwargs.get('y', 0))
+		self._data['size'] = CuSize(kwargs.get('w', CuHelper.getW()), kwargs.get('h', CuHelper.getH()))
+
 
 		if self._data['parent'] is None:
 			CuHelper.setMainWidget(self)
 
 		self._data['childs'] = []
-		self._data['win'] = CuWrapper.newWin(self, self._data['x'], self._data['y'], self._data['w'], self._data['h'])
+		self._data['win'] = CuWrapper.newWin(self, self._data['pos'].x(), self._data['pos'].y(), self._data['size'].width(), self._data['size'].height())
 		self._data['layout'] = None
 		self._data['mouse'] = {'underMouse':False}
 		self._data['focus'] = False
@@ -93,32 +92,34 @@ class CuWidget:
 				mouseEvent = False
 				if isinstance(evt, CuMouseEvent):
 					mouseEvent = True
-					wx, wy = CuHelper.absPos(widget)
-					ww, wh = widget.size()
-					ewx, ewy = evt.windowPos()
-					esx, esy = evt.screenPos()
-					lx, ly = esx-wx, esy-wy
+					wpos = CuHelper.absPos(widget)
+					wsize = widget.size()
+					ewpos = evt.windowPos()
+					espos = evt.screenPos()
+					lpos = espos-wpos
 					# Skip the mouse event if outside this widget
-					if lx >= 0 and ly >= 0 and lx < ww and ly < wh:
+					# TODO: Use CuRect instead
+					if lpos.x() >= 0 and lpos.y() >= 0 and lpos.x() < wsize.width() and lpos.y() < wsize.height():
 						# ex,  ey  = evt.pos()
 						wevt = CuMouseEvent(
 							type=evt.type(),
-							localPos  = {'x':lx,  'y':ly},
-							windowPos = {'x':ewx, 'y':ewy},
-							screenPos = {'x':esx, 'y':esy},
-							button=evt.button())
+							localPos  = lpos,
+							windowPos = ewpos,
+							screenPos = espos,
+							button = evt.button())
 				if isinstance(evt, CuWheelEvent):
 					mouseEvent = True
-					wx, wy = CuHelper.absPos(widget)
-					ww, wh = widget.size()
-					egx, egy = evt.globalPos()
-					lx, ly = egx-wx, egy-wy
+					wpos = CuHelper.absPos(widget)
+					wsize = widget.size()
+					egpos = evt.globalPos()
+					lpos = egpos-wpos
 					# Skip the mouse event if outside this widget
-					if lx >= 0 and ly >= 0 and lx < ww and ly < wh:
+					# TODO: Use CuRect instead
+					if lpos.x() >= 0 and lpos.y() >= 0 and lpos.x() < wsize.width() and lpos.y() < wsize.height():
 						wevt = CuWheelEvent(
 							type=evt.type(),
-							pos  = {'x':lx,  'y':ly},
-							globalPos = {'x':egx,     'y':egy},
+							pos  = lpos,
+							globalPos = egpos,
 							angleDelta=evt.angleDelta())
 				if mouseEvent:
 					if wevt is not None:
@@ -182,13 +183,13 @@ class CuWidget:
 	def parentWidget(self):
 		return self._data['parent']
 
-	def x(self): return self._data['x']
-	def y(self): return self._data['y']
-	def width(self):  return self._data['w']
-	def height(self): return self._data['h']
+	def x(self): return self._data['pos'].x()
+	def y(self): return self._data['pos'].y()
+	def width(self):  return self._data['size'].width()
+	def height(self): return self._data['size'].height()
 
-	def pos(self): return self._data['x'], self._data['y']
-	def size(self):   return self._data['w'], self._data['h']
+	def pos(self): return self._data['pos']
+	def size(self):   return self._data['size']
 
 	def maximumSize(self):
 		return self.maximumWidth(), self.maximumHeight()
@@ -237,19 +238,19 @@ class CuWidget:
 	def setMinimumWidth(self, minw):      self._extra['minw'] = minw
 
 	def move(self, x, y):
-		self._data['x'] = x
-		self._data['y'] = y
-		self._data['win'].move(self._data['x'], self._data['y'])
+		self._data['pos'].setX(x)
+		self._data['pos'].setY(y)
+		self._data['win'].move(self._data['pos'].x(), self._data['pos'].y())
 		if self._data['layout'] is not None:
-			self._data['layout'].setGeometry(self._data['x'], self._data['y'], self._data['w'], self._data['h'])
+			self._data['layout'].setGeometry(self._data['pos'].x(), self._data['pos'].y(), self._data['size'].width(), self._data['size'].height())
 		self.update()
 
 	def resize(self, w, h):
-		self._data['w'] = w
-		self._data['h'] = h
-		self._data['win'].resize(self._data['w'],self._data['h'])
+		self._data['size'].setWidth(w)
+		self._data['size'].setHeight(h)
+		self._data['win'].resize(self._data['size'].width(), self._data['size'].height())
 		if self._data['layout'] is not None:
-			self._data['layout'].setGeometry(self._data['x'], self._data['y'], self._data['w'], self._data['h'])
+			self._data['layout'].setGeometry(self._data['pos'].x(), self._data['pos'].y(), self._data['size'].width(), self._data['size'].height())
 		self.update()
 
 	def setGeometry(self, x, y, w, h):

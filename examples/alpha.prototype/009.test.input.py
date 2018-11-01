@@ -5,7 +5,7 @@ import sys
 import logging
 
 from CuT import CuTCore, CuTWidgets
-from CuT.CuTCore import  CuT, CuEvent, pycutSlot, pycutSignal
+from CuT.CuTCore import  CuT, CuPoint, CuSize,  CuEvent, pycutSlot, pycutSignal
 from CuT.CuTGui import CuPainter
 from CuT.CuTHelper import CuWrapper
 
@@ -22,7 +22,7 @@ class CuTestInput(CuTWidgets.CuWidget):
 
 	def wheelEvent(self, evt):
 		logging.debug("evt:"+str(evt.type())+" Name:"+self.accessibleName())
-		self._wheelAngle = evt.angleDelta()
+		self._wheelAngle = evt.angleDelta().y()
 		self.update()
 
 	def keyReleaseEvent(self, evt):
@@ -108,6 +108,13 @@ class CuTestInput(CuTWidgets.CuWidget):
 		qp.setBrush(CuT.yellow)
 		qp.drawText(12, 30, " Parodi ")
 
+		qp.setPen(CuT.yellow)
+		qp.setBrush(CuT.gray)
+		qp.drawText(3, 31, " Eugenio ")
+		qp.setPen(CuT.red)
+		qp.setBrush(CuT.gray)
+		qp.drawText(12, 31, " Parodi ")
+
 		qp.setBrush(CuT.black)
 
 		qp.setPen(CuT.darkGreen)
@@ -161,6 +168,8 @@ def main(screen):
 	tw1 = addFrame(ti1)
 	layout.addWidget(tw1)
 
+	layout.addWidget(addFrame(CuTWidgets.CuScrollBar(parent=mw)))
+
 	vlayout2 = CuTWidgets.CuVBoxLayout()
 	ti2 = CuTestInput(parent=mw, name='Wheel Focus 002')
 	ti2.setFocusPolicy(CuT.WheelFocus)
@@ -173,7 +182,7 @@ def main(screen):
 
 	lineEdit = CuTWidgets.CuLineEdit(parent=mw)
 	lineEdit.setText("Eugenio Parodi 123456789 - abcdefghijklmnopqrstu")
-	vlayout2.addWidget(lineEdit)
+	vlayout2.addWidget(addFrame(lineEdit))
 
 	log = CuTWidgets.CuPlainTextEdit(parent=mw)
 	log.setMaximumSize(10000,20)

@@ -9,7 +9,7 @@ import sys
 import struct
 
 from CuT import CuTCore
-from CuT.CuTCore import  CuT
+from CuT.CuTCore import  CuT, CuPoint
 from CuT.CuTCore import CuEvent, CuMouseEvent, CuWheelEvent, CuKeyEvent
 from CuT.CuTHelper import CuWrapper, CuHelper
 from CuT.CuTHelper.urwid.compat import bytes3
@@ -17,6 +17,10 @@ from CuT.CuTHelper.urwid.compat import bytes3
 class CuApplication:
 	def __init__(self, screen, argv):
 		CuHelper.__CuInit__(screen)
+
+	@staticmethod
+	def wheelScrollLines():
+		return 4
 
 	def exec_(self):
 		event = 0
@@ -91,28 +95,28 @@ class CuApplication:
 						button = CuT.MidButton
 
 				elif bstate == 0x010000: # Mouse Wheel UP
-						angleDelta = 120
+						angleDelta = CuPoint(0,120)
 						btype = CuEvent.Wheel
 				elif bstate == 0x200000: # Mouse Wheel DOWN
-						angleDelta = -120
+						angleDelta = CuPoint(0,-120)
 						btype = CuEvent.Wheel
 
 				# if bstate == curses.BUTTON1_DOUBLE_CLICKED: event =  CuEvent.MouseButtonDblClick
 				# if bstate == curses.BUTTON1_TRIPLE_CLICKED: event =  CuEvent.MouseButtonPress
-
-				mwx, mwy = CuHelper.GLBL['mainWidget'].pos()
+				curpos = CuPoint(x,y)
+				mwpos = CuHelper.GLBL['mainWidget'].pos()
 				if btype == CuEvent.Wheel:
 					mouse_evt = CuWheelEvent(
 						type=btype,
-						pos  = {'x':x-mwx, 'y':y-mwy},
-						globalPos = {'x':x,     'y':y},
+						pos  = curpos + mwpos,
+						globalPos = curpos,
 						angleDelta=angleDelta)
 				else:
 					mouse_evt = CuMouseEvent(
 						type=btype,
-						localPos  = {'x':x-mwx, 'y':y-mwy},
-						windowPos = {'x':x-mwx, 'y':y-mwy},
-						screenPos = {'x':x,     'y':y},
+						localPos  = curpos + mwpos,
+						windowPos = curpos + mwpos,
+						screenPos = curpos,
 						button=button)
 
 				CuHelper.GLBL['mainWidget'].event(mouse_evt)

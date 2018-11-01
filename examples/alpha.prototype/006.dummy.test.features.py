@@ -66,10 +66,10 @@ class CuTestInput(CuTWidgets.CuWidget):
 	def event(self, evt):
 		#logging.debug("evt:"+str(evt.type())+" Name:"+self.accessibleName())
 		if isinstance(evt, CuTCore.CuMouseEvent):
-			self._ix, self._iy = evt.pos()
-			self._gx, self._gy = evt.globalPos()
-			self._sx, self._sy = evt.screenPos()
-			self._wx, self._wy = evt.screenPos()
+			self._ix, self._iy = evt.pos().x(), evt.pos().y()
+			self._gx, self._gy = evt.globalPos().x(), evt.globalPos().y()
+			self._sx, self._sy = evt.screenPos().x(), evt.screenPos().y()
+			self._wx, self._wy = evt.screenPos().x(), evt.screenPos().y()
 			self._bstate = evt.button()
 		self.update()
 		return CuTWidgets.CuWidget.event(self, evt)
@@ -92,15 +92,15 @@ class CuMovableTestInput(CuTestInput):
 		logging.debug("evt:"+str(evt.button())+" Name:"+self.accessibleName())
 		if evt.button() == CuT.LeftButton:
 			self._state = "Pressed"
-			self._px, self._py = self.pos()
-			self._mx, self._my = evt.screenPos()
+			self._px, self._py = self.pos().x(), self.pos().y()
+			self._mx, self._my = evt.screenPos().x(), evt.screenPos().y()
 
 	def mouseReleaseEvent(self, evt):
 		self._state = None
 
 	def event(self, evt):
 		if isinstance(evt, CuTCore.CuMouseEvent):
-			x, y = evt.screenPos()
+			x, y = evt.screenPos().x(), evt.screenPos().y()
 			if evt.type() == CuEvent.MouseMove:
 				if self._state == "Pressed":
 					newx = self._px+x-self._mx

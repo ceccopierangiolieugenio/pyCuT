@@ -89,7 +89,7 @@ class CuLineEdit(CuWidget):
 		if newDisplayLen > self.width():
 			newDisplayLen = self.width()
 		# cuDebug("W:"+str(self.width())+"  NewDl: "+str(newDisplayLen)+"  lastdl: "+str(self._lastDisplayLen))
-		if self._lastDisplayLen > newDisplayLen:			
+		elif self._lastDisplayLen > newDisplayLen:			
 			qp.eraseRect(newDisplayLen, 0, self._lastDisplayLen - newDisplayLen, 1)
 		self._lastDisplayLen = newDisplayLen
 		qp.drawText(0, 0, self._text[self._displayOffset:].encode('utf-8'))
@@ -97,7 +97,7 @@ class CuLineEdit(CuWidget):
 		qp.end()
 
 	def mousePressEvent(self, evt):
-		x, y = evt.pos()
+		x = evt.pos().x()
 		x += self._displayOffset
 		if x > len(self._text):
 			self._cursorPosition = len(self._text)

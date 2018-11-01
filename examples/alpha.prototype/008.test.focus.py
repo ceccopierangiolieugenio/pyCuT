@@ -21,7 +21,7 @@ class CuTestInput(CuTWidgets.CuWidget):
 
 	def wheelEvent(self, evt):
 		logging.debug("evt:"+str(evt.type())+" Name:"+self.accessibleName())
-		self._wheelAngle = evt.angleDelta()
+		self._wheelAngle = evt.angleDelta().y()
 		self.update()
 
 	def event(self, evt):

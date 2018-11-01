@@ -45,16 +45,16 @@ class CuTestInput(CuTWidgets.CuWidget):
 
 	def wheelEvent(self, evt):
 		logging.debug("evt:"+str(evt.type())+" Name:"+self.accessibleName())
-		self._wheelAngle = evt.angleDelta()
+		self._wheelAngle = evt.angleDelta().y()
 		self.update()
 
 	def event(self, evt):
 		#logging.debug("evt:"+str(evt.type())+" Name:"+self.accessibleName())
 		if isinstance(evt, CuTCore.CuMouseEvent):
-			self._ix, self._iy = evt.pos()
-			self._gx, self._gy = evt.globalPos()
-			self._sx, self._sy = evt.screenPos()
-			self._wx, self._wy = evt.screenPos()
+			self._ix, self._iy = evt.pos().x(), evt.pos().y()
+			self._gx, self._gy = evt.globalPos().x(), evt.globalPos().y()
+			self._sx, self._sy = evt.screenPos().x(), evt.screenPos().y()
+			self._wx, self._wy = evt.screenPos().x(), evt.screenPos().y()
 			self._bstate = evt.button()
 		self.update()
 		return CuTWidgets.CuWidget.event(self, evt)
