@@ -1,3 +1,5 @@
+***NOTE:*** *This project is no more active and has been ported/rewritten to [pyTermTk](https://github.com/ceccopierangiolieugenio/pyTermTk)*
+
 # pyCuT
 Text-based user interface library ([TUI](https://en.wikipedia.org/wiki/Text-based_user_interface)) loosely based on QT api
 
